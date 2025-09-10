@@ -1,7 +1,11 @@
-# Compiled class file
+# ------------------------------
+# Java / Spring Boot (Maven & Gradle)
+# ------------------------------
+
+# Compiled class files
 *.class
 
-# Log file
+# Log files
 *.log
 
 # BlueJ files
@@ -13,12 +17,102 @@
 # Package Files #
 *.jar
 *.war
-*.nar
 *.ear
-*.zip
-*.tar.gz
-*.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Gradle
+.gradle/
+build/
+!gradle-wrapper.jar
+
+# Gradle Wrapper
+gradle-wrapper.properties
+gradle-wrapper.jar
+
+# Eclipse
+.project
+.classpath
+.csettings/
+.settings/
+.metadata/
+bin/
+tmp/
+
+# IntelliJ
+*.iml
+.idea/
+out/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Spring Boot Dev Tools
+.spring-boot-devtools.properties
+
+# ------------------------------
+# Node / Next.js (frontend)
+# ------------------------------
+
+# Node modules
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+jspm_packages/
+
+# dotenv environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Next.js export
+out/
+
+# Misc
+.DS_Store
+*.swp
+*.swo
+
+# Package-lock files (optional — include if you're committed to exact versions)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional: OS or editor-specific
+Thumbs.db
+ehthumbs.db
+*.orig
+*.bak
+*.tmp
+
