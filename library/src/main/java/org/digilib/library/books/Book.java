@@ -1,4 +1,9 @@
 package org.digilib.library.books;
 
-public class Book {
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table
+public final class Book {
 }
