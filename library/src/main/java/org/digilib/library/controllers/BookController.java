@@ -1,41 +1,72 @@
 package org.digilib.library.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.digilib.library.models.Book;
+import org.digilib.library.models.dto.BookCreateData;
 import org.digilib.library.repositories.BookRepository;
+
+import org.digilib.library.errors.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class BookController {
 
+    private static final int PAGE_SIZE = 15;
+
     private final BookRepository bookRepository;
 
     @GetMapping("/books")
-    @ResponseStatus(value = HttpStatus.OK, reason = "returns books successfully")
     public ResponseEntity<List<Book>> getAllBooks(
             @RequestParam(defaultValue = "1") int pageNumber,
             @RequestParam(defaultValue = "isbn") String sort) {
 
-        Pageable pageable = PageRequest.of(pageNumber - 1, 10, Sort.by(sort));
+        Pageable pageable = PageRequest.of(
+                Math.max(0, pageNumber - 1),
+                PAGE_SIZE,
+                Sort.by(sort)
+        );
 
         Page<Book> books = bookRepository.findAll(pageable);
 
-      return ResponseEntity.ok(books.getContent());
+      return ResponseEntity.status(HttpStatus.OK)
+              .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
+              .body(books.getContent());
+    }
+
+    @GetMapping("/books/{isbn}")
+    public ResponseEntity<Book> getBook(@PathVariable String isbn) {
+        String normalised = isbn.replaceAll("[-\\s]", "");
+
+        Optional<Book> book = bookRepository.findByIsbn(normalised);
+
+        return  book.map(bk ->
+                        ResponseEntity.status(HttpStatus.OK)
+                                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
+                                .body(bk))
+                    .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
     }
 
     @PostMapping("/books")
-    @ResponseStatus(value = HttpStatus.CREATED, reason = "creates books")
-    public ResponseEntity<Book> createBook(@RequestBody Book book) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookRepository.save(book));
+    public ResponseEntity<String> createBook(@RequestBody @Valid BookCreateData creationData) {
+
+        Book saved = bookRepository.save(Book.createFrom(creationData));
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                             .body(saved.getIsbn());
     }
 }
