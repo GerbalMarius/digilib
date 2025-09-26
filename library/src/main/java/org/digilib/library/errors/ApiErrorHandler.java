@@ -67,6 +67,7 @@ public final class ApiErrorHandler {
         LinkedHashMap<String, Object> errorMap = Errors.orderedStatusMap(1, HttpStatus.INTERNAL_SERVER_ERROR);
 
         errorMap.put("message", ex.getMessage());
+        errorMap.put("cause", ex.getClass());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorMap);
