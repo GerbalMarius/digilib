@@ -1,4 +1,4 @@
-package org.digilib.library.books;
+package org.digilib.library.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +15,5 @@ public final class Book {
 
     @Column(name = "title", length = 300, nullable = false)
     private String title;
-
-    @
 
 }
