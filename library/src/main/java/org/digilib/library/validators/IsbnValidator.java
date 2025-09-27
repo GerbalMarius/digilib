@@ -33,7 +33,7 @@ public class IsbnValidator implements ConstraintValidator<Isbn, String> {
         }
     }
 
-    private boolean isValidIsbn10(String s) {
+    public static boolean isValidIsbn10(String s) {
         if (!s.matches("\\d{9}[\\dXx]")) return false;
 
         int sum = 0;
@@ -53,7 +53,7 @@ public class IsbnValidator implements ConstraintValidator<Isbn, String> {
         return sum % 11 == 0;
     }
 
-    private boolean isValidIsbn13(String s) {
+    public static boolean isValidIsbn13(String s) {
         if (!s.matches("\\d{13}")) return false;
 
         int sum = 0;

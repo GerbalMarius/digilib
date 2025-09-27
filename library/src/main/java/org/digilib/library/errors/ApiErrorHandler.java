@@ -1,5 +1,6 @@
 package org.digilib.library.errors;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -47,8 +48,13 @@ public final class ApiErrorHandler {
         mappedErrors.put("message", mnse.getMessage());
         mappedErrors.put("supportedMethods", allowedMethods);
 
+        HttpHeaders headers = new HttpHeaders();
+        if (allowedMethods != null && allowedMethods.length > 0) {
+            headers.add(HttpHeaders.ALLOW, String.join(", ", allowedMethods));
+        }
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .headers(headers)
                 .body(mappedErrors);
     }
 
@@ -68,6 +74,7 @@ public final class ApiErrorHandler {
         Map<String, Object> mappedErrors = Errors.httpResponseMap(2, HttpStatus.BAD_REQUEST);
         mappedErrors.put("message", mse.getMessage());
         mappedErrors.put("parameter", mse.getParameterName());
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(mappedErrors);
     }
@@ -87,7 +94,7 @@ public final class ApiErrorHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> exceptionFallBack(Exception ex) {
-        Map<String, Object> errorMap = Errors.httpResponseMap(1, HttpStatus.INTERNAL_SERVER_ERROR);
+        Map<String, Object> errorMap = Errors.httpResponseMap(2, HttpStatus.INTERNAL_SERVER_ERROR);
 
         errorMap.put("message", ex.getMessage());
         errorMap.put("cause", ex.getClass());

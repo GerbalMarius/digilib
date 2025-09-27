@@ -6,7 +6,7 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 @Getter
-public class InvalidRequestParamException extends RuntimeException {
+public final class InvalidRequestParamException extends RuntimeException {
 
     private String paramName;
 
@@ -22,11 +22,6 @@ public class InvalidRequestParamException extends RuntimeException {
         this.paramValue = paramValue;
     }
 
-
-    private static InvalidRequestParamException invalidRequestParamException(String paramName, Object paramValue) {
-        return new InvalidRequestParamException("The supplied value for " + paramName + " is not valid", paramName, paramValue);
-    }
-
     public static void throwIf(int value, String paramName, IntPredicate predicate){
         if (predicate.test(value)) {
            throw  invalidRequestParamException(paramName, value);
@@ -37,5 +32,9 @@ public class InvalidRequestParamException extends RuntimeException {
         if (predicate.test(value)) {
             throw  invalidRequestParamException(paramName, value);
         }
+    }
+
+    private static InvalidRequestParamException invalidRequestParamException(String paramName, Object paramValue) {
+        return new InvalidRequestParamException("The supplied value for " + paramName + " is not valid", paramName, paramValue);
     }
 }

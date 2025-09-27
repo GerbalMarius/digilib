@@ -22,10 +22,10 @@ public final class Book {
     private String title;
 
     @Column(name = "created_at")
-    private Instant created_at;
+    private Instant createdAt;
 
     @Column(name = "updated_at")
-    private Instant updated_at;
+    private Instant updatedAt;
 
 
     public Book() {}
@@ -33,8 +33,8 @@ public final class Book {
     public Book(String isbn, String title) {
         this.isbn = isbn;
         this.title = title;
-        this.created_at = Instant.now();
-        this.updated_at = Instant.now();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public static Book createFrom(BookCreateData createData) {
