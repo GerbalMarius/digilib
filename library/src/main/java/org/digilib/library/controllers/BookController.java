@@ -3,11 +3,13 @@ package org.digilib.library.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.digilib.library.errors.InvalidRequestParamException;
 import org.digilib.library.models.Book;
 import org.digilib.library.models.dto.BookCreateData;
 import org.digilib.library.repositories.BookRepository;
-
 import org.digilib.library.errors.ResourceNotFoundException;
+
+import org.digilib.library.utils.Params;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -31,21 +32,25 @@ public class BookController {
     private final BookRepository bookRepository;
 
     @GetMapping("/books")
-    public ResponseEntity<List<Book>> getAllBooks(
-            @RequestParam(defaultValue = "1") int pageNumber,
-            @RequestParam(defaultValue = "isbn") String sort) {
+    public ResponseEntity<Page<Book>> getAllBooks(
+            @RequestParam(name = "page") int pageNumber,
+            @RequestParam(name = "sorts") String[] sorts) {
+
+        InvalidRequestParamException.throwIf(pageNumber, "page", num -> num <= 0);
+
+        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> !Params.areValidSorts(strings, Book.class));
 
         Pageable pageable = PageRequest.of(
-                Math.max(0, pageNumber - 1),
+                pageNumber - 1,
                 PAGE_SIZE,
-                Sort.by(sort)
+                Sort.by(sorts)
         );
 
-        Page<Book> books = bookRepository.findAll(pageable);
+        Page<Book> bookPage = bookRepository.findAll(pageable);
 
       return ResponseEntity.status(HttpStatus.OK)
               .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
-              .body(books.getContent());
+              .body(bookPage);
     }
 
     @GetMapping("/books/{isbn}")
