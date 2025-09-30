@@ -1,8 +1,10 @@
 package org.digilib.library.errors;
 
+import jakarta.validation.ValidationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -13,10 +15,20 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public final class ApiErrorHandler {
+
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleMalformedRequestBodies(HttpMessageNotReadableException hmnre){
+        Map<String, Object> malformedErrors = Errors.httpResponseMap(2, HttpStatus.BAD_REQUEST);
+        malformedErrors.put("message", hmnre.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(malformedErrors);
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException manve){
@@ -24,19 +36,29 @@ public final class ApiErrorHandler {
         Map<String, Object> validationErrors = HashMap.newHashMap(3);
 
         validationErrors.put("timestamp", Instant.now());
-        validationErrors.put("status", HttpStatus.BAD_REQUEST.value());
+        validationErrors.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
 
         List<Map.Entry<String, String>> errors = manve.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(err -> Map.entry(err.getField(), err.getDefaultMessage()))
-                .collect(Collectors.toList());
+                .toList();
 
         validationErrors.put("errors", errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(validationErrors);
 
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleFallBackOnValidation(ValidationException ve){
+        Map<String, Object> validationErrors = Errors.httpResponseMap(2, HttpStatus.BAD_REQUEST);
+        validationErrors.put("message", ve.getMessage());
+        validationErrors.put("reason", "Malformed request payload");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(validationErrors);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -91,6 +113,7 @@ public final class ApiErrorHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(mappedErrors);
     }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> exceptionFallBack(Exception ex) {

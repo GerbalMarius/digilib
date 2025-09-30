@@ -8,6 +8,8 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 public class LibraryApplication {
 
+    public static final String BACK_URL = "http://localhost:8080";
+
     static void main(String[] args) {
 		SpringApplication.run(LibraryApplication.class, args);
 	}
