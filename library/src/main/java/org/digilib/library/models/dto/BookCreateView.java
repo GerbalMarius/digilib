@@ -1,6 +1,7 @@
 package org.digilib.library.models.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.digilib.library.validators.Isbn;
 
@@ -28,7 +29,10 @@ public record BookCreateView(
         @Size(min = 2, max = 10, message = "Language letters must be no longer than 10")
         String language,
 
-        String edition
+        String edition,
+
+        @NotNull(message = "genreId must be provided")
+        Long genreId
         ) {
 
 

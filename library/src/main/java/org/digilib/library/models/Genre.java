@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +25,12 @@ public final class Genre {
     @Column(name = "id")
     private long id;
 
-    @Column(name = "title", length = 80, nullable = false)
+    @Column(name = "title", length = 30, nullable = false)
     private String title;
 
     @OneToMany(mappedBy = "genre", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     @Builder.Default
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private List<Book> books = new ArrayList<>();
 
 

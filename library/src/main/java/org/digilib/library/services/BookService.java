@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.digilib.library.errors.ResourceNotFoundException;
 import org.digilib.library.models.Book;
+import org.digilib.library.models.Genre;
 import org.digilib.library.models.dto.BookCreateView;
 import org.digilib.library.models.dto.BookUpdateView;
 import org.digilib.library.repositories.BookRepository;
@@ -25,7 +26,13 @@ public  class BookService {
     private final GenreRepository genreRepository;
 
 
-    public  Book createBookFrom(BookCreateView createData) {
+    public Book createBookFrom(BookCreateView createData) {
+
+        Long genreId = createData.genreId();
+        Genre genre = genreRepository.findById(genreId)
+                .orElseThrow(() -> ResourceNotFoundException.of(Genre.class, genreId));
+
+
         Book book = Book.builder()
                 .isbn(createData.isbn())
                 .title(createData.title())
@@ -35,6 +42,7 @@ public  class BookService {
                 .publicationDate(createData.publicationDate())
                 .language(createData.language())
                 .edition(createData.edition())
+                .genre(genre)
                 .build();
 
         return bookRepository.save(book);

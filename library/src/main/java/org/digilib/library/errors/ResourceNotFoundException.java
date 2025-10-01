@@ -16,6 +16,6 @@ public final class ResourceNotFoundException extends RuntimeException {
     }
 
     public static <T, ID> ResourceNotFoundException of(Class<? extends T> clazz, ID id) {
-        return new ResourceNotFoundException(String.format("%s not found", clazz.getSimpleName()), id);
+        return new ResourceNotFoundException(clazz.getSimpleName() + " not found", id);
     }
 }

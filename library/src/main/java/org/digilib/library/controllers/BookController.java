@@ -1,6 +1,5 @@
 package org.digilib.library.controllers;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +33,6 @@ import static org.digilib.library.LibraryApplication.*;
 @RequiredArgsConstructor
 @Slf4j
 public class BookController {
-
 
     private final BookService bookService;
 
@@ -98,9 +96,10 @@ public class BookController {
     @DeleteMapping("/books/{isbn}")
     public ResponseEntity<?> deleteBook(@PathVariable String isbn) {
         InvalidRequestParamException.throwIf(isbn, "isbn", s -> !IsbnValidator.isValidIsbn13(s));
+
         String normalised = isbn.replaceAll("[-\\s]", "");
 
-        bookService.deleteByIsbn(isbn);
+        bookService.deleteByIsbn(normalised);
 
 
         return ResponseEntity.noContent().build();
