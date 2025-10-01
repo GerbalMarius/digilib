@@ -1,6 +1,7 @@
 package org.digilib.library.errors;
 
 import jakarta.validation.ValidationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +23,19 @@ public final class ApiErrorHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleMalformedRequestBodies(HttpMessageNotReadableException hmnre){
-        Map<String, Object> malformedErrors = Errors.httpResponseMap(2, HttpStatus.BAD_REQUEST);
+        Map<String, Object> malformedErrors = Errors.httpResponseMap(1, HttpStatus.BAD_REQUEST);
         malformedErrors.put("message", hmnre.getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(malformedErrors);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException dvi){
+        Map<String, Object> malformedErrors = Errors.httpResponseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
+        malformedErrors.put("message", dvi.getMessage());
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(malformedErrors);
     }
 
