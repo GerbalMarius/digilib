@@ -5,8 +5,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.digilib.library.models.dto.BookCreateView;
-import org.digilib.library.models.dto.BookUpdateView;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -44,8 +42,11 @@ public final class Book {
     @Column(name = "language", length = 10)
     private String language;
 
-    @Column(name = "edition", length = 50)
+    @Column(name = "edition", length = 15)
     private String edition;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Genre genre;
 
     @Column(name = "created_at")
     private Instant createdAt;
@@ -56,46 +57,6 @@ public final class Book {
 
     public Book() {}
 
-    public static Book createFrom(BookCreateView createData) {
-        return Book.builder()
-                .isbn(createData.isbn())
-                .title(createData.title())
-                .summary(createData.summary())
-                .imageUrl(createData.imageUrl())
-                .pageCount(createData.pageCount())
-                .publicationDate(createData.publicationDate())
-                .language(createData.language())
-                .edition(createData.edition())
-                .build();
-    }
-
-    public Book updateFrom(BookUpdateView updateData) {
-
-        if (updateData.title() != null) {
-            this.setTitle(updateData.title().trim());
-        }
-        if (updateData.summary() != null) {
-            this.setSummary(updateData.summary().trim());
-        }
-        if (updateData.imageUrl() != null) {
-            this.setImageUrl(updateData.imageUrl().trim());
-        }
-        if (updateData.pageCount() != null) {
-            this.setPageCount(updateData.pageCount());
-        }
-        if (updateData.publicationDate() != null) {
-            this.setPublicationDate(updateData.publicationDate());
-        }
-        if (updateData.language() != null) {
-            this.setLanguage(updateData.language().trim());
-        }
-        if (updateData.edition() != null) {
-            this.setEdition(updateData.edition().trim());
-        }
-        this.setUpdatedAt(Instant.now());
-
-        return this;
-    }
 
     @PrePersist
     private void onCreate() {

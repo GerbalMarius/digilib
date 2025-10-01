@@ -10,9 +10,9 @@ import org.digilib.library.models.Book;
 import org.digilib.library.models.dto.BookCreateView;
 import org.digilib.library.models.dto.BookData;
 import org.digilib.library.models.dto.BookUpdateView;
-import org.digilib.library.repositories.BookRepository;
 import org.digilib.library.errors.ResourceNotFoundException;
 
+import org.digilib.library.services.BookService;
 import org.digilib.library.utils.Params;
 import org.digilib.library.validators.IsbnValidator;
 import org.springframework.data.domain.Page;
@@ -35,9 +35,8 @@ import static org.digilib.library.LibraryApplication.*;
 @Slf4j
 public class BookController {
 
-    private static final int PAGE_SIZE = 15;
 
-    private final BookRepository bookRepository;
+    private final BookService bookService;
 
     @GetMapping("/books")
     public ResponseEntity<Page<BookData>> getAllBooks(
@@ -54,7 +53,7 @@ public class BookController {
                 Sort.by(sorts)
         );
 
-        Page<Book> bookPage = bookRepository.findAll(pageable);
+        Page<Book> bookPage = bookService.findAll(pageable);
 
       return ResponseEntity.ok()
               .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
@@ -62,51 +61,46 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public ResponseEntity<Book> createBook(@RequestBody @Valid BookCreateView creationData) {
+    public ResponseEntity<BookData> createBook(@RequestBody @Valid BookCreateView creationData) {
 
-        Book saved = bookRepository.save(Book.createFrom(creationData));
+        Book saved = bookService.createBookFrom(creationData);
 
         return ResponseEntity.created(URI.create(BACK_URL + "/api/books"))
-                .body(saved);
+                .body(BookData.wrapBook(saved));
     }
 
     @GetMapping("/books/{isbn}")
-    public ResponseEntity<Book> getBook(@PathVariable String isbn) {
+    public ResponseEntity<BookData> getBook(@PathVariable String isbn) {
         InvalidRequestParamException.throwIf(isbn, "isbn", s -> !IsbnValidator.isValidIsbn13(s));
 
         String normalised = isbn.replaceAll("[-\\s]", "");
 
-        Optional<Book> book = bookRepository.findByIsbn(normalised);
+        Optional<Book> book = bookService.findByIsbn(normalised);
 
         return  book.map(bk -> ResponseEntity.ok()
                                 .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
-                                .body(bk))
+                                .body(BookData.wrapBook(bk)))
                     .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
     }
 
     @PatchMapping("/books/{isbn}")
-    public ResponseEntity<Book> updateBook(@PathVariable String isbn, @RequestBody @Valid BookUpdateView updateData) {
+    public ResponseEntity<BookData> updateBook(@PathVariable String isbn, @RequestBody @Valid BookUpdateView updateData) {
 
-        Book existing = bookRepository.findByIsbn(isbn)
+        Book existing = bookService.findByIsbn(isbn)
                                       .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
 
-        Book updated = existing.updateFrom(updateData);
+        Book updated = bookService.updateBookFrom(existing, updateData);
 
-        bookRepository.save(updated);
 
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(BookData.wrapBook(updated));
     }
 
     @DeleteMapping("/books/{isbn}")
-    @Transactional
     public ResponseEntity<?> deleteBook(@PathVariable String isbn) {
         InvalidRequestParamException.throwIf(isbn, "isbn", s -> !IsbnValidator.isValidIsbn13(s));
         String normalised = isbn.replaceAll("[-\\s]", "");
 
-        Book found = bookRepository.findByIsbn(normalised)
-                .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
-
-        bookRepository.delete(found);
+        bookService.deleteByIsbn(isbn);
 
 
         return ResponseEntity.noContent().build();
