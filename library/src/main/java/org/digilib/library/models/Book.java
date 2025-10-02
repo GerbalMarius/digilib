@@ -8,6 +8,8 @@ import lombok.Data;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -47,6 +49,16 @@ public final class Book {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Genre genre;
+
+    @Basic(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "book_authors",
+            joinColumns = {@JoinColumn(name = "book_id", referencedColumnName = "isbn")},
+            inverseJoinColumns = {@JoinColumn(name = "author_id", referencedColumnName = "id")}
+    )
+    @Builder.Default
+    private List<Author> authors =  new ArrayList<>();
 
     @Column(name = "created_at")
     private Instant createdAt;

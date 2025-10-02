@@ -37,7 +37,7 @@ public class GenreController {
     @GetMapping("/genres")
     public ResponseEntity<List<GenreData>> getAllGenres(@RequestParam(name = "sorts") String[] sorts) {
 
-        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> !Params.areValidSorts(strings, Genre.class));
+        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> Params.invalidSorts(strings, Genre.class));
 
 
         return ResponseEntity.ok()
@@ -61,7 +61,7 @@ public class GenreController {
 
         InvalidRequestParamException.throwIf(pageNumber, "pageNumber", n -> n <= 0);
 
-        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> !Params.areValidSorts(strings, Book.class));
+        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> Params.invalidSorts(strings, Book.class));
 
         var pageable = PageRequest.of(
                 pageNumber - 1,

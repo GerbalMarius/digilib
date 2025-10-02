@@ -5,15 +5,16 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 public class Params {
     private Params(){}
 
-    public static <T> boolean areValidSorts(String[] sorts, Class<? extends T> clazz){
+    public static <T> boolean invalidSorts(String[] sorts, Class<? extends T> clazz){
 
         if(sorts == null || sorts.length == 0) {
-            return false;
+            return true;
         }
 
         Set<String> declaredFields = Arrays.stream(clazz.getDeclaredFields())
@@ -22,11 +23,11 @@ public class Params {
 
         for(String fieldName : sorts) {
             if(!declaredFields.contains(fieldName)) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     public static <T> void setIfPresent(T item, Consumer<? super T> setter){
@@ -40,5 +41,7 @@ public class Params {
         }
     }
 
-
+    public static <T> String eTag(T item, ToLongFunction<? super T> longFn){
+        return "\"" + Long.toHexString(longFn.applyAsLong(item)) + "\"";
+    }
 }

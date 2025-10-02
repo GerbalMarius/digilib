@@ -33,6 +33,11 @@ public final class Genre {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private List<Book> books = new ArrayList<>();
 
+    @OneToMany(mappedBy = "genre", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    @Builder.Default
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private List<Author> authors = new ArrayList<>();
+
 
     public Genre() {}
 

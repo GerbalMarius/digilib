@@ -43,7 +43,7 @@ public class BookController {
 
         InvalidRequestParamException.throwIf(pageNumber, "page", num -> num <= 0);
 
-        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> !Params.areValidSorts(strings, Book.class));
+        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> Params.invalidSorts(strings, Book.class));
 
         Pageable pageable = PageRequest.of(
                 pageNumber - 1,
