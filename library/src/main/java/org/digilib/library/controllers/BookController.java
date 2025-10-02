@@ -12,7 +12,6 @@ import org.digilib.library.models.dto.BookUpdateView;
 import org.digilib.library.errors.ResourceNotFoundException;
 
 import org.digilib.library.services.BookService;
-import org.digilib.library.utils.Params;
 import org.digilib.library.validators.IsbnValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,9 +40,9 @@ public class BookController {
             @RequestParam(name = "page") int pageNumber,
             @RequestParam(name = "sorts") String[] sorts) {
 
-        InvalidRequestParamException.throwIf(pageNumber, "page", num -> num <= 0);
+        InvalidRequestParamException.negativePage(pageNumber);
 
-        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> Params.invalidSorts(strings, Book.class));
+        InvalidRequestParamException.notValidSorts(sorts, Book.class);
 
         Pageable pageable = PageRequest.of(
                 pageNumber - 1,
@@ -53,9 +52,9 @@ public class BookController {
 
         Page<Book> bookPage = bookService.findAll(pageable);
 
-      return ResponseEntity.ok()
-              .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
-              .body(bookPage.map(BookData::wrapBook));
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
+                .body(bookPage.map(BookData::wrapBook));
     }
 
     @PostMapping("/books")
@@ -75,17 +74,17 @@ public class BookController {
 
         Optional<Book> book = bookService.findByIsbn(normalised);
 
-        return  book.map(bk -> ResponseEntity.ok()
-                                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
-                                .body(BookData.wrapBook(bk)))
-                    .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
+        return book.map(bk -> ResponseEntity.ok()
+                        .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
+                        .body(BookData.wrapBook(bk)))
+                .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
     }
 
     @PatchMapping("/books/{isbn}")
     public ResponseEntity<BookData> updateBook(@PathVariable String isbn, @RequestBody @Valid BookUpdateView updateData) {
 
         Book existing = bookService.findByIsbn(isbn)
-                                      .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
+                .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
 
         Book updated = bookService.updateBookFrom(existing, updateData);
 
@@ -103,5 +102,5 @@ public class BookController {
 
 
         return ResponseEntity.noContent().build();
-        }
     }
+}

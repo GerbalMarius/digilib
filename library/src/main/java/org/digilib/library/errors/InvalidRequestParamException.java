@@ -1,6 +1,7 @@
 package org.digilib.library.errors;
 
 import lombok.Getter;
+import org.digilib.library.utils.Params;
 
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
@@ -32,6 +33,14 @@ public final class InvalidRequestParamException extends RuntimeException {
         if (predicate.test(value)) {
             throw  invalidRequestParamException(paramName, value);
         }
+    }
+
+    public static void negativePage(int pageNumber) {
+        throwIf(pageNumber, "page", num -> num <= 0);
+    }
+
+    public static <T> void notValidSorts(String[] sorts, Class<? extends T> clazz) {
+        throwIf(sorts, "sorts", strings -> Params.invalidSorts(strings, clazz));
     }
 
     private static InvalidRequestParamException invalidRequestParamException(String paramName, Object paramValue) {

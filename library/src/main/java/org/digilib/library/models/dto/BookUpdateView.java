@@ -5,6 +5,7 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record BookUpdateView(
@@ -23,7 +24,9 @@ public record BookUpdateView(
         @Size(min = 2, max = 10, message = "Language letters must be between 2 and 10")
         String language,
 
-        String edition
+        String edition,
+
+        List<Long> authorIds
 ) {
     @AssertTrue(message = "At least one field must be provided for update")
     @SuppressWarnings("unused")
@@ -34,6 +37,8 @@ public record BookUpdateView(
                 || pageCount != null
                 || publicationDate != null
                 || language != null
-                || edition != null;
+                || edition != null
+                || authorIds != null;
     }
+
 }

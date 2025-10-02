@@ -22,7 +22,7 @@ public final class Genre {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", updatable = false)
     private long id;
 
     @Column(name = "title", length = 30, nullable = false)

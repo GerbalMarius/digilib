@@ -44,7 +44,7 @@ public final class Author {
     @ManyToOne(fetch = FetchType.LAZY)
     private Genre genre;
 
-    @ManyToMany(mappedBy = "authors")
+    @ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Book> books = new ArrayList<>();
 

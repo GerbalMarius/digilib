@@ -1,11 +1,13 @@
 package org.digilib.library.models.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.digilib.library.validators.Isbn;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record BookCreateView(
         @NotBlank(message = "isbn must be provided")
@@ -32,7 +34,10 @@ public record BookCreateView(
         String edition,
 
         @NotNull(message = "genreId must be provided")
-        Long genreId
+        Long genreId,
+
+        @NotEmpty(message = "at least one author must be provided")
+        List<Long> authorIds
         ) {
 
 

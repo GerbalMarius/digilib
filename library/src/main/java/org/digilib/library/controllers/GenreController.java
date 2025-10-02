@@ -9,8 +9,8 @@ import org.digilib.library.models.Genre;
 import org.digilib.library.models.dto.BookData;
 import org.digilib.library.models.dto.GenreCreateView;
 import org.digilib.library.models.dto.GenreData;
+import org.digilib.library.models.dto.GenreUpdateView;
 import org.digilib.library.services.GenreService;
-import org.digilib.library.utils.Params;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,12 +37,12 @@ public class GenreController {
     @GetMapping("/genres")
     public ResponseEntity<List<GenreData>> getAllGenres(@RequestParam(name = "sorts") String[] sorts) {
 
-        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> Params.invalidSorts(strings, Genre.class));
+        InvalidRequestParamException.notValidSorts(sorts, Genre.class);
 
 
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
-                .body(genreService.findAllViews(Sort.by(sorts)));
+                .body(genreService.findAll(Sort.by(sorts)));
     }
 
 
@@ -59,9 +59,9 @@ public class GenreController {
             @RequestParam(name = "page") int pageNumber,
             @RequestParam(name = "sorts") String[] sorts) {
 
-        InvalidRequestParamException.throwIf(pageNumber, "pageNumber", n -> n <= 0);
+        InvalidRequestParamException.negativePage(pageNumber);
 
-        InvalidRequestParamException.throwIf(sorts, "sorts", strings -> Params.invalidSorts(strings, Book.class));
+        InvalidRequestParamException.notValidSorts(sorts, Book.class);
 
         var pageable = PageRequest.of(
                 pageNumber - 1,
@@ -79,6 +79,11 @@ public class GenreController {
     public ResponseEntity<GenreData> createGenre(@RequestBody @Valid GenreCreateView  genreCreateData) {
         return ResponseEntity.created(URI.create(BACK_URL + "/api/genres"))
                 .body(genreService.createGenre(genreCreateData));
+    }
+
+    @PutMapping("/genres/{id}")
+    public ResponseEntity<GenreData> updateGenre(@PathVariable long id, @RequestBody @Valid GenreUpdateView genreUpdateData) {
+        return ResponseEntity.ok(genreService.updateGenre(id, genreUpdateData));
     }
 
 

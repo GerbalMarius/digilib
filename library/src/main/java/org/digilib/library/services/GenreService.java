@@ -6,6 +6,7 @@ import org.digilib.library.models.Genre;
 import org.digilib.library.models.dto.BookData;
 import org.digilib.library.models.dto.GenreCreateView;
 import org.digilib.library.models.dto.GenreData;
+import org.digilib.library.models.dto.GenreUpdateView;
 import org.digilib.library.repositories.BookRepository;
 import org.digilib.library.repositories.GenreRepository;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,7 @@ public class GenreService {
     private final BookRepository bookRepository;
 
 
-    public List<GenreData> findAllViews(Sort sort) {
+    public List<GenreData> findAll(Sort sort) {
         return genreRepository.findAll(sort)
                 .stream()
                 .map(GenreData::wrapGenre)
@@ -52,5 +53,14 @@ public class GenreService {
         Genre saved = genreRepository.save(created);
 
         return GenreData.wrapGenre(saved);
+    }
+
+    public GenreData updateGenre(long id, GenreUpdateView genreUpdateData) {
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> ResourceNotFoundException.of(Genre.class, id));
+
+        genre.setTitle(genreUpdateData.title());
+        genreRepository.save(genre);
+        return GenreData.wrapGenre(genre);
     }
 }

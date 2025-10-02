@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 public class Params {
@@ -41,7 +40,4 @@ public class Params {
         }
     }
 
-    public static <T> String eTag(T item, ToLongFunction<? super T> longFn){
-        return "\"" + Long.toHexString(longFn.applyAsLong(item)) + "\"";
-    }
 }
