@@ -56,8 +56,7 @@ public class AuthorService {
         Genre genre = genreRepository.findById(authorData.genreId())
                 .orElseThrow(() -> ResourceNotFoundException.of(Genre.class, authorData.genreId()));
 
-        Author author = Author
-                .builder()
+        Author author = Author.builder()
                 .firstName(authorData.firstName())
                 .lastName(authorData.lastName())
                 .birthDate(authorData.birthDate())

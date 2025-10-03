@@ -15,7 +15,7 @@ public record BookCreateView(
         String isbn,
 
         @NotBlank(message = "title must be provided")
-        @Size(min = 13, max = 300, message = "title length must be: 13 <= title < 300")
+        @Size(min = 13, max = 300)
         String title,
 
         @NotBlank(message = "summary must be provided")

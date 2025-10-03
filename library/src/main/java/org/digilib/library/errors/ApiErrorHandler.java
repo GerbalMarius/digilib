@@ -68,7 +68,7 @@ public final class ApiErrorHandler {
 
         typeMismatchErrors.put("message", mte.getMessage());
         typeMismatchErrors.put("value", mte.getValue());
-        typeMismatchErrors.put("providedType", mte.getValue().getClass().getSimpleName());
+        typeMismatchErrors.put("providedType", mte.getValue().getClass().getSimpleName().toLowerCase());
         typeMismatchErrors.put("requiredType", mte.getRequiredType());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
