@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -59,6 +60,19 @@ public final class ApiErrorHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(validationErrors);
 
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException mte){
+        Map<String, Object> typeMismatchErrors = Errors.httpResponseMap(4, HttpStatus.BAD_REQUEST);
+
+        typeMismatchErrors.put("message", mte.getMessage());
+        typeMismatchErrors.put("value", mte.getValue());
+        typeMismatchErrors.put("providedType", mte.getValue().getClass().getSimpleName());
+        typeMismatchErrors.put("requiredType", mte.getRequiredType());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(typeMismatchErrors);
     }
 
     @ExceptionHandler(ValidationException.class)
