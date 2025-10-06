@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "book_copies", indexes = {
@@ -20,10 +22,12 @@ public final class BookCopy {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_isbn", referencedColumnName = "isbn")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "library_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Library library;
 
     @Column(name = "barcode", unique = true, nullable = false, length = 50)

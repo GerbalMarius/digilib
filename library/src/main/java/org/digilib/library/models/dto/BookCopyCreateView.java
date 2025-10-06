@@ -3,7 +3,6 @@ package org.digilib.library.models.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import org.digilib.library.validators.Isbn;
 
 public record BookCopyCreateView(
@@ -13,7 +12,8 @@ public record BookCopyCreateView(
         String bookIsbn,
 
         @NotNull(message = "barcode must be provided")
-        @Pattern(regexp = "(\\p{javaUpperCase}{2}|\\p{javaUpperCase}{3})-(\\d{4})", message = "barcodes must consist of 2 or 3 upper letters a hyphen followed by 4 digits")
+        @Pattern(regexp = "(\\p{javaUpperCase}{2}|\\p{javaUpperCase}{3})-(\\d{4})",
+                 message = "barcodes must consist of 2 or 3 upper letters a hyphen followed by 4 digits")
         String barcode
 ) {
 }

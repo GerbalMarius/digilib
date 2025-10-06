@@ -29,11 +29,11 @@ public class AuthorService {
                 .map(AuthorData::wrapAuthor);
     }
 
-    public AuthorData findById(long id) {
+    public AuthorData findById(long authorId) {
 
-        return authorRepository.findById(id)
+        return authorRepository.findById(authorId)
                 .map(AuthorData::wrapAuthor)
-                .orElseThrow(() -> ResourceNotFoundException.of(Author.class, id));
+                .orElseThrow(() -> ResourceNotFoundException.of(Author.class, authorId));
     }
 
     public Page<BookData> findBooksByAuthor(long authorId,  Pageable pageable) {
@@ -44,12 +44,18 @@ public class AuthorService {
                 .map(BookData::wrapBook);
     }
 
-    public void deleteById(long id) {
-        Author author = authorRepository.findById(id)
-                .orElseThrow(() -> ResourceNotFoundException.of(Author.class, id));
+    public void deleteById(long authorId) {
+        Author author = authorRepository.findById(authorId)
+                .orElseThrow(() -> ResourceNotFoundException.of(Author.class, authorId));
 
         authorRepository.delete(author);
 
+    }
+
+    public AuthorData findAuthorByGenre(long authorId, Genre genre) {
+        return authorRepository.findByIdAndGenre(authorId, genre)
+                .map(AuthorData::wrapAuthor)
+                .orElseThrow(() -> ResourceNotFoundException.of(Author.class, authorId));
     }
 
     public AuthorData createFrom(AuthorCreateView authorData) {

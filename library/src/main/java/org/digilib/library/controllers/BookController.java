@@ -40,7 +40,7 @@ public class BookController {
             @RequestParam(name = "page") int pageNumber,
             @RequestParam(name = "sorts") String[] sorts) {
 
-        InvalidRequestParamException.negativePage(pageNumber);
+        InvalidRequestParamException.notPositivePage(pageNumber);
 
         InvalidRequestParamException.notValidSorts(sorts, Book.class);
 

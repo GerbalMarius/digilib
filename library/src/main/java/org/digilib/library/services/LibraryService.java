@@ -8,6 +8,7 @@ import org.digilib.library.models.Library;
 import org.digilib.library.models.Status;
 import org.digilib.library.models.dto.BookCopyCreateView;
 import org.digilib.library.models.dto.BookCopyData;
+import org.digilib.library.models.dto.BookCopyUpdateView;
 import org.digilib.library.models.dto.LibraryData;
 import org.digilib.library.repositories.BookCopyRepository;
 import org.digilib.library.repositories.BookRepository;
@@ -15,6 +16,8 @@ import org.digilib.library.repositories.LibraryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import static org.digilib.library.utils.Params.setIfPresent;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +60,25 @@ public class LibraryService {
         BookCopy saved = bookCopyRepository.save(bookCopy);
 
         return BookCopyData.wrapCopy(saved);
+    }
+
+    public BookCopyData updateBookCopy(Library library, long bookCopyId, BookCopyUpdateView bookCopyUpdateView) {
+        BookCopy bookCopy = bookCopyRepository.findBookCopyByIdAndLibrary(bookCopyId, library)
+                .orElseThrow(() -> ResourceNotFoundException.of(BookCopy.class, bookCopyId));
+
+        setIfPresent(bookCopyUpdateView.barcode(), String::trim, bookCopy::setBarcode);
+        setIfPresent(bookCopyUpdateView.status(), bookCopy::setStatus);
+
+        BookCopy saved = bookCopyRepository.save(bookCopy);
+
+        return BookCopyData.wrapCopy(saved);
+    }
+
+    public void deleteBookCopy(Library library,  long bookCopyId) {
+        BookCopy bookCopy = bookCopyRepository.findBookCopyByIdAndLibrary(bookCopyId, library)
+                .orElseThrow(() -> ResourceNotFoundException.of(BookCopy.class, bookCopyId));
+
+        bookCopyRepository.delete(bookCopy);
     }
 
 }

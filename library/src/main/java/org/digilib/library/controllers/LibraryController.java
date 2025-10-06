@@ -7,6 +7,7 @@ import org.digilib.library.models.BookCopy;
 import org.digilib.library.models.Library;
 import org.digilib.library.models.dto.BookCopyCreateView;
 import org.digilib.library.models.dto.BookCopyData;
+import org.digilib.library.models.dto.BookCopyUpdateView;
 import org.digilib.library.models.dto.LibraryData;
 import org.digilib.library.services.LibraryService;
 import org.springframework.data.domain.Page;
@@ -30,11 +31,10 @@ public class LibraryController {
 
 
     @GetMapping("/libraries")
-    public ResponseEntity<Page<LibraryData>> getAllLibraries(
-            @RequestParam(name = "page") int pageNumber,
-            @RequestParam(name = "sorts") String[] sorts
-    ){
-        InvalidRequestParamException.negativePage(pageNumber);
+    public ResponseEntity<Page<LibraryData>> getAllLibraries(@RequestParam(name = "page") int pageNumber,
+                                                             @RequestParam(name = "sorts") String[] sorts) {
+
+        InvalidRequestParamException.notPositivePage(pageNumber);
         InvalidRequestParamException.notValidSorts(sorts, Library.class);
 
         var pageable = PageRequest.of(
@@ -58,9 +58,9 @@ public class LibraryController {
     @GetMapping("/libraries/{id}/books")
     public ResponseEntity<Page<BookCopyData>> getLibraryBooksById(@PathVariable long id,
                                                                   @RequestParam(name = "page") int pageNumber,
-                                                                  @RequestParam(name = "sorts") String[] sorts){
+                                                                  @RequestParam(name = "sorts") String[] sorts) {
 
-        InvalidRequestParamException.negativePage(pageNumber);
+        InvalidRequestParamException.notPositivePage(pageNumber);
         InvalidRequestParamException.notValidSorts(sorts, BookCopy.class);
 
         Library library = libraryService.findById(id);
@@ -78,10 +78,32 @@ public class LibraryController {
     }
 
     @PostMapping("/libraries/{id}/books")
-    public ResponseEntity<BookCopyData> addLibraryBook(@PathVariable long id, @RequestBody @Valid BookCopyCreateView bookCopyCreateView){
+    public ResponseEntity<BookCopyData> addLibraryBook(@PathVariable long id,
+                                                       @RequestBody @Valid BookCopyCreateView newBookCopy) {
         Library library = libraryService.findById(id);
 
         return ResponseEntity.created(URI.create(BACK_URL + "/api/libraries/" + id + "/books"))
-                .body(libraryService.addBookCopyTo(library, bookCopyCreateView));
+                .body(libraryService.addBookCopyTo(library, newBookCopy));
+    }
+
+    @PatchMapping("/libraries/{libraryId}/books/{bookId}")
+    public ResponseEntity<BookCopyData> updateLibraryBook(@PathVariable long libraryId,
+                                                          @PathVariable long bookId,
+                                                          @RequestBody @Valid BookCopyUpdateView updateData) {
+
+        Library library = libraryService.findById(libraryId);
+
+        return ResponseEntity.ok(libraryService.updateBookCopy(library, bookId, updateData));
+    }
+
+    @DeleteMapping("/libraries/{libraryId}/books/{bookId}")
+    public ResponseEntity<?> deleteLibraryBook(@PathVariable long libraryId,
+                                               @PathVariable long bookId) {
+
+        Library library = libraryService.findById(libraryId);
+
+        libraryService.deleteBookCopy(library, bookId);
+
+        return ResponseEntity.noContent().build();
     }
 }

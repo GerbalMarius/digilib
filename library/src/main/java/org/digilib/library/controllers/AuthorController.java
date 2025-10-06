@@ -34,7 +34,7 @@ public class AuthorController {
     public ResponseEntity<Page<AuthorData>> getAuthors(@RequestParam(name = "page") int pageNumber,
                                                        @RequestParam(name = "sorts") String[] sorts){
 
-        InvalidRequestParamException.negativePage(pageNumber);
+        InvalidRequestParamException.notPositivePage(pageNumber);
 
         InvalidRequestParamException.notValidSorts(sorts, Author.class);
 
@@ -64,7 +64,7 @@ public class AuthorController {
             @RequestParam(name = "page") int pageNumber,
             @RequestParam(name = "sorts") String[] sorts) {
 
-        InvalidRequestParamException.negativePage(pageNumber);
+        InvalidRequestParamException.notPositivePage(pageNumber);
 
         InvalidRequestParamException.notValidSorts(sorts, Book.class);
 

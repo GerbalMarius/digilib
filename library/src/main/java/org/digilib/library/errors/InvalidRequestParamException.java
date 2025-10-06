@@ -1,10 +1,15 @@
 package org.digilib.library.errors;
 
 import lombok.Getter;
-import org.digilib.library.utils.Params;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Getter
 public final class InvalidRequestParamException extends RuntimeException {
@@ -35,12 +40,35 @@ public final class InvalidRequestParamException extends RuntimeException {
         }
     }
 
-    public static void negativePage(int pageNumber) {
+    public static void notPositivePage(int pageNumber) {
         throwIf(pageNumber, "page", num -> num <= 0);
     }
 
     public static <T> void notValidSorts(String[] sorts, Class<? extends T> clazz) {
-        throwIf(sorts, "sorts", strings -> Params.invalidSorts(strings, clazz));
+        if(sorts == null || sorts.length == 0) {
+            throw new InvalidRequestParamException("sort args array is null or empty", "sorts", sorts);
+        }
+
+        Set<String> declaredFields = Arrays.stream(clazz.getDeclaredFields())
+                .map(Field::getName)
+                .collect(Collectors.toSet());
+
+        List<String> paramNames = new ArrayList<>(declaredFields.size());
+
+        for(String fieldName : sorts) {
+            if(!declaredFields.contains(fieldName)) {
+                paramNames.add(fieldName);
+            }
+        }
+
+        if(!paramNames.isEmpty()) {
+            throw new InvalidRequestParamException(
+                    "The supplied sorting fields are not present in entity of type " + clazz.getSimpleName(),
+                    "sorts",
+                    paramNames
+            );
+        }
+
     }
 
     private static InvalidRequestParamException invalidRequestParamException(String paramName, Object paramValue) {
