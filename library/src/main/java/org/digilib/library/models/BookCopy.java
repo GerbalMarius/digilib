@@ -9,7 +9,8 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "book_copies", indexes = {
-        @Index(name = "idx_book_copies_id", columnList = "id")
+        @Index(name = "idx_book_copies_id", columnList = "id", unique = true),
+        @Index(name = "idx_book_copies_barcode", columnList = "barcode", unique = true)
 })
 @AllArgsConstructor
 @Builder
@@ -27,7 +28,6 @@ public final class BookCopy {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "library_id", referencedColumnName = "id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Library library;
 
     @Column(name = "barcode", unique = true, nullable = false, length = 50)
