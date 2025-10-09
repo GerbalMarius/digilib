@@ -6,10 +6,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Getter
 public final class InvalidRequestParamException extends RuntimeException {
@@ -49,9 +47,9 @@ public final class InvalidRequestParamException extends RuntimeException {
             throw new InvalidRequestParamException("sort args array is null or empty", "sorts", sorts);
         }
 
-        Set<String> declaredFields = Arrays.stream(clazz.getDeclaredFields())
+        List<String> declaredFields = Arrays.stream(clazz.getDeclaredFields())
                 .map(Field::getName)
-                .collect(Collectors.toSet());
+                .toList();
 
         List<String> paramNames = new ArrayList<>(declaredFields.size());
 

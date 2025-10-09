@@ -1,11 +1,13 @@
 package org.digilib.library.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.digilib.library.errors.InvalidRequestParamException;
 import org.digilib.library.models.Author;
 import org.digilib.library.models.Book;
 import org.digilib.library.models.dto.AuthorCreateView;
 import org.digilib.library.models.dto.AuthorData;
+import org.digilib.library.models.dto.AuthorUpdateView;
 import org.digilib.library.models.dto.BookData;
 import org.digilib.library.services.AuthorService;
 import org.springframework.data.domain.Page;
@@ -46,18 +48,11 @@ public class AuthorController {
 
         Page<AuthorData> authorPage = authorService.findAll(pageable);
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(60, TimeUnit.MINUTES).cachePublic())
+                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
                 .body(authorPage);
     }
 
-    @GetMapping("/authors/{id}")
-    public ResponseEntity<AuthorData> getAuthor(@PathVariable long id){
-        AuthorData author = authorService.findById(id);
 
-        return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(60, TimeUnit.MINUTES).cachePublic())
-                .body(author);
-    }
 
     @GetMapping("/authors/{id}/books")
     public ResponseEntity<Page<BookData>> getBooksByAuthor(@PathVariable long id,
@@ -86,6 +81,23 @@ public class AuthorController {
 
         return ResponseEntity.created(URI.create(BACK_URL + "/api/authors"))
                 .body(authorService.createFrom(authorData));
+    }
+
+    @GetMapping("/authors/{id}")
+    public ResponseEntity<AuthorData> getAuthor(@PathVariable long id){
+        AuthorData author = authorService.findById(id);
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
+                .body(author);
+    }
+
+    @PatchMapping("/authors/{id}")
+    public ResponseEntity<AuthorData> updateAuthor(@PathVariable long id, @RequestBody @Valid AuthorUpdateView updateData){
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
+                .body(authorService.update(id, updateData));
     }
 
     @DeleteMapping("/authors/{id}")

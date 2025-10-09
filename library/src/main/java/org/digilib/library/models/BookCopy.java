@@ -28,6 +28,7 @@ public final class BookCopy {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "library_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Library library;
 
     @Column(name = "barcode", unique = true, nullable = false, length = 50)

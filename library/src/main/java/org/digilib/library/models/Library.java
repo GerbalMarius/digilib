@@ -11,7 +11,8 @@ import java.util.List;
 @Entity
 @Table(name = "libraries", indexes = {
         @Index(name = "idx_libraries_id", columnList = "id", unique = true),
-        @Index(name = "idx_libraries_name", columnList = "name",  unique = true)
+        @Index(name = "idx_libraries_name", columnList = "name",  unique = true),
+        @Index(name = "idx_libraries_email", columnList = "email", unique = true)
 })
 @Data
 @AllArgsConstructor

@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.digilib.library.errors.InvalidRequestParamException;
 import org.digilib.library.models.BookCopy;
 import org.digilib.library.models.Library;
-import org.digilib.library.models.dto.BookCopyCreateView;
-import org.digilib.library.models.dto.BookCopyData;
-import org.digilib.library.models.dto.BookCopyUpdateView;
-import org.digilib.library.models.dto.LibraryData;
+import org.digilib.library.models.dto.*;
 import org.digilib.library.services.LibraryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,6 +50,19 @@ public class LibraryController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
                 .body(LibraryData.wrapLibrary(libraryService.findById(id)));
+    }
+
+    @PostMapping("/libraries")
+    public ResponseEntity<LibraryData> createNewLibrary(@RequestBody @Valid LibraryCreateView  newLibrary){
+
+        return ResponseEntity.created(URI.create(BACK_URL + "/api/libraries"))
+                .body(libraryService.createNewLibrary(newLibrary));
+    }
+
+    @DeleteMapping("/libraries/{id}")
+    public ResponseEntity<?> deleteLibraryById(@PathVariable long id){
+        libraryService.deleteLibrary(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/libraries/{id}/books")
