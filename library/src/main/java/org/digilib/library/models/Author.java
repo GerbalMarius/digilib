@@ -44,7 +44,6 @@ public final class Author {
     private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Genre genre;
 
     @ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)

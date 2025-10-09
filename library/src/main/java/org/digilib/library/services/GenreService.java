@@ -24,8 +24,8 @@ public class GenreService {
     private final AuthorRepository authorRepository;
 
 
-    public List<GenreData> findAll(Sort sort) {
-        return genreRepository.findAll(sort)
+    public List<GenreData> findAll() {
+        return genreRepository.findAll()
                 .stream()
                 .map(GenreData::wrapGenre)
                 .toList();

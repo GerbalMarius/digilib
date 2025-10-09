@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -29,6 +30,17 @@ public final class ApiErrorHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(malformedErrors);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException hmtmpe){
+        Map<String, Object> mediaErrors = Errors.httpResponseMap(2, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+
+        mediaErrors.put("mediaTypes", hmtmpe.getSupportedMediaTypes());
+        mediaErrors.put("message", hmtmpe.getMessage());
+
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body(mediaErrors);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

@@ -36,13 +36,12 @@ public class GenreController {
 
 
     @GetMapping("/genres")
-    public ResponseEntity<List<GenreData>> getAllGenres(@RequestParam(name = "sorts") String[] sorts) {
+    public ResponseEntity<List<GenreData>> getAllGenres() {
 
-        InvalidRequestParamException.notValidSorts(sorts, Genre.class);
 
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
-                .body(genreService.findAll(Sort.by(sorts)));
+                .body(genreService.findAll());
     }
 
 

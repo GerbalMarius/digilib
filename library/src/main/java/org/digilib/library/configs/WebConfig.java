@@ -10,16 +10,24 @@ import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 @Configuration
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class WebConfig implements WebMvcConfigurer {
+
+    private static final MediaType UTF_8_JSON = new MediaType("application", "json", StandardCharsets.UTF_8);
 
     @Override
     public void configureContentNegotiation(@NonNull ContentNegotiationConfigurer config) {
         config.favorParameter(false)
                 .ignoreAcceptHeader(true)
-                .defaultContentType(MediaType.APPLICATION_JSON)
-                .mediaType("json", MediaType.APPLICATION_JSON);
+                .defaultContentType(UTF_8_JSON)
+                .mediaTypes(Map.of(
+                        "json", UTF_8_JSON
+                ))
+        ;
     }
 
     @Bean

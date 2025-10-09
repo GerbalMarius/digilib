@@ -50,7 +50,6 @@ public final class Book {
     private String edition;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Genre genre;
 
     @Basic(fetch = FetchType.LAZY)
