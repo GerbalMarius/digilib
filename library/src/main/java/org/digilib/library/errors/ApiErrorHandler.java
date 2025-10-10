@@ -1,6 +1,5 @@
 package org.digilib.library.errors;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,7 +19,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public final class ApiErrorHandler {
@@ -78,13 +76,19 @@ public final class ApiErrorHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex) {
-        Map<String, String> errors = ex.getConstraintViolations().stream()
-                .collect(Collectors.toMap(
-                        v -> v.getPropertyPath().toString(),
-                        ConstraintViolation::getMessage,
-                        (a, b) -> a + "; " + b
-                ));
+    public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
+        Map<String, Object> errors = Errors.httpResponseMap(3, HttpStatus.UNPROCESSABLE_ENTITY);
+
+        List<Map.Entry<String, String>> violations = ex.getConstraintViolations()
+                .stream()
+                .map(cv -> Map.entry(cv.getPropertyPath().toString(), cv.getMessage()))
+                .toList();
+
+        errors.put("errors", violations);
+
+
+        errors.put("timestamp", Instant.now());
+        errors.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(errors);
