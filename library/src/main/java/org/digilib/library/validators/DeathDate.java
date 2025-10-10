@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = DeathAfterBirthValidator.class)
+@Constraint(validatedBy = DeathDateValidator.class)
 @Documented
 public @interface DeathDate {
     String message() default "Death date must be valid";

@@ -1,12 +1,15 @@
 package org.digilib.library.errors;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +22,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public final class ApiErrorHandler {
@@ -62,11 +66,14 @@ public final class ApiErrorHandler {
         validationErrors.put("timestamp", Instant.now());
         validationErrors.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
 
-        List<Map.Entry<String, String>> errors = manve.getBindingResult()
+        var errors = manve.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(err -> Map.entry(err.getField(), err.getDefaultMessage()))
-                .toList();
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fieldError -> fieldError.getDefaultMessage(),
+                        (a, _) -> a
+                ));
 
         validationErrors.put("errors", errors);
 
@@ -79,10 +86,13 @@ public final class ApiErrorHandler {
     public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
         Map<String, Object> errors = Errors.httpResponseMap(3, HttpStatus.UNPROCESSABLE_ENTITY);
 
-        List<Map.Entry<String, String>> violations = ex.getConstraintViolations()
+        var violations = ex.getConstraintViolations()
                 .stream()
-                .map(cv -> Map.entry(cv.getPropertyPath().toString(), cv.getMessage()))
-                .toList();
+                .collect(Collectors.toMap(
+                        cv -> cv.getPropertyPath().toString(),
+                        ConstraintViolation::getMessage,
+                        (a, _) -> a)
+                );
 
         errors.put("errors", violations);
 

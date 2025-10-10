@@ -6,7 +6,7 @@ import org.digilib.library.models.dto.AuthorUpdateView;
 
 import java.time.LocalDate;
 
-public class DeathAfterBirthValidator implements ConstraintValidator<DeathDate, AuthorUpdateView> {
+public class DeathDateValidator implements ConstraintValidator<DeathDate, AuthorUpdateView> {
 
     @Override
     public boolean isValid(AuthorUpdateView dto, ConstraintValidatorContext context) {
