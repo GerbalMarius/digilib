@@ -3,14 +3,14 @@ package org.digilib.library.models.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import org.digilib.library.validators.DeathAfterBirth;
+import org.digilib.library.validators.DeathDate;
 
 
 import java.time.LocalDate;
 
 @Setter
 @Getter
-@DeathAfterBirth
+@DeathDate
 public class AuthorUpdateView {
 
     // getters / setters

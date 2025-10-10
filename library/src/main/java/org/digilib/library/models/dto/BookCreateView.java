@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.digilib.library.validators.Isbn;
+import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +25,7 @@ public record BookCreateView(
         @NotBlank(message = "imageUrl mustn't be empty")
         String imageUrl,
 
+        @Range(min = 0, message = "pageCount must be positive")
         Integer pageCount,
 
         LocalDate publicationDate,

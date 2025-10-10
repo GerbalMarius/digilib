@@ -8,8 +8,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = DeathAfterBirthValidator.class)
 @Documented
-public @interface DeathAfterBirth {
-    String message() default "Death date must be after birth date";
+public @interface DeathDate {
+    String message() default "Death date must be valid";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

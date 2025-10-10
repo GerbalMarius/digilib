@@ -3,6 +3,7 @@ package org.digilib.library.models.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ public record BookUpdateView(
 
         String imageUrl,
 
+        @Range(min = 0, message = "pageCount must be positive")
         Integer pageCount,
 
         LocalDate publicationDate,

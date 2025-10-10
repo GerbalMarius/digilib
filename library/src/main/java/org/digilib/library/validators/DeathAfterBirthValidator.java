@@ -6,22 +6,22 @@ import org.digilib.library.models.dto.AuthorUpdateView;
 
 import java.time.LocalDate;
 
-public class DeathAfterBirthValidator implements ConstraintValidator<DeathAfterBirth, AuthorUpdateView> {
+public class DeathAfterBirthValidator implements ConstraintValidator<DeathDate, AuthorUpdateView> {
 
     @Override
     public boolean isValid(AuthorUpdateView dto, ConstraintValidatorContext context) {
-        if (dto == null) return true;
-
         LocalDate deathDate = dto.getDeathDate();
         if (deathDate == null) return true;
 
         LocalDate birthDate = dto.getBirthDate() != null ? dto.getBirthDate() : dto.getExistingBirthDate();
         if (birthDate == null) return true;
 
-        if (deathDate.isAfter(birthDate) || deathDate.isEqual(birthDate)) {
+        LocalDate today = LocalDate.now();
+
+        if ((deathDate.isAfter(birthDate) || deathDate.isEqual(birthDate))
+                && (deathDate.isBefore(today) || deathDate.isEqual(today))) {
             return true;
         }
-
 
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
