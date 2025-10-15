@@ -52,8 +52,9 @@ public final class Book {
     @ManyToOne(fetch = FetchType.LAZY)
     private Genre genre;
 
-    @Basic(fetch = FetchType.LAZY)
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade =
+            {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "book_authors",
             joinColumns = {@JoinColumn(name = "book_id", referencedColumnName = "isbn")},
