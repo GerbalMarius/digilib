@@ -48,7 +48,7 @@ public class AuthController {
         setRefreshCookie(response, auth.refresh());
 
         return ResponseEntity.ok()
-                .body(LoginResponse.of(auth));
+                .body(LoginResponse.of(auth.access(), authService.isExpiredToken(auth.access()), auth.user()));
     }
 
     private void setRefreshCookie(HttpServletResponse res, String value) {

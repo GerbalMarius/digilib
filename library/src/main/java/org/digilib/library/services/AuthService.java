@@ -31,7 +31,7 @@ public class AuthService {
 
     }
 
-    public String issueAccessToken(UserDetails user) {
-        return jwtService.generateAccessToken(user);
+    public boolean isExpiredToken(String token) {
+        return jwtService.isExpired(token);
     }
 }
