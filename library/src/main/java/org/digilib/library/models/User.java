@@ -9,7 +9,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -52,9 +51,9 @@ public final class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .sorted(Comparator.comparing(SimpleGrantedAuthority::getAuthority))
-                .collect(Collectors.toCollection(() -> new ArrayList<>(roles.size())));
+                .map(role -> new SimpleGrantedAuthority( "ROLE_" + role.getName()))
+                .sorted(Comparator.comparing(GrantedAuthority::getAuthority))
+                .toList();
     }
 
     @Override

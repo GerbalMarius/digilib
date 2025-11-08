@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.digilib.library.errors.InvalidRequestParamException;
 import org.digilib.library.models.Book;
-import org.digilib.library.models.dto.BookCreateView;
-import org.digilib.library.models.dto.BookData;
-import org.digilib.library.models.dto.BookUpdateView;
+import org.digilib.library.models.dto.book.BookCreateView;
+import org.digilib.library.models.dto.book.BookData;
+import org.digilib.library.models.dto.book.BookUpdateView;
 import org.digilib.library.errors.ResourceNotFoundException;
 
 import org.digilib.library.services.BookService;

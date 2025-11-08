@@ -10,7 +10,7 @@ public final class Errors {
     private Errors(){}
 
     /**
-     * Creates a  hashMap with base capacity for timestamp, status code, status name.
+     * Creates a hashMap with base capacity for timestamp, status code, status name.
      * @param additionalCapacity capacity for additional params to be added later.
      * @param status http status to create this map with.
      * @return  hashMap with status and timestamp filled in. This map is modifiable.

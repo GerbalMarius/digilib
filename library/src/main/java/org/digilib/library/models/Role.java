@@ -26,7 +26,7 @@ public final class Role {
     private String name;
 
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     private List<User> users = new ArrayList<>();
 

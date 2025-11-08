@@ -1,4 +1,4 @@
-package org.digilib.library.models.dto;
+package org.digilib.library.models.dto.book;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

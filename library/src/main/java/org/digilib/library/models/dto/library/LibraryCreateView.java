@@ -1,4 +1,4 @@
-package org.digilib.library.models.dto;
+package org.digilib.library.models.dto.library;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.AssertTrue;

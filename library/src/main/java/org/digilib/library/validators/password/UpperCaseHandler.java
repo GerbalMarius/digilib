@@ -17,7 +17,7 @@ public class UpperCaseHandler extends BaseHandler<String> {
 
     @Override
     public boolean handle(String value, ConstraintValidatorContext context) {
-        if (value == null || UPPERCASE.matcher(value).matches()) {
+        if (value == null || !UPPERCASE.matcher(value).find()) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
             return false;

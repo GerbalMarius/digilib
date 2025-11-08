@@ -3,12 +3,12 @@ package org.digilib.library.errors;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -20,7 +20,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -80,6 +79,22 @@ public final class ApiErrorHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(validationErrors);
 
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateEmail(DuplicateEmailException de){
+        Map<String, Object> duplicateEmailErrors = Errors.httpResponseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
+        duplicateEmailErrors.put("message", de.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(duplicateEmailErrors);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentials(){
+        Map<String, Object> badCredentialsErrors = Errors.httpResponseMap(1, HttpStatus.UNAUTHORIZED);
+        badCredentialsErrors.put("message", "Invalid credentials provided for email or password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(badCredentialsErrors);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

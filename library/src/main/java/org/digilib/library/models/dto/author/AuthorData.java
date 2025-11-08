@@ -1,4 +1,4 @@
-package org.digilib.library.models.dto;
+package org.digilib.library.models.dto.author;
 
 import org.digilib.library.models.Author;
 

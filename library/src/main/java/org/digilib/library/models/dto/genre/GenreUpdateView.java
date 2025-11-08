@@ -1,4 +1,4 @@
-package org.digilib.library.models.dto;
+package org.digilib.library.models.dto.genre;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

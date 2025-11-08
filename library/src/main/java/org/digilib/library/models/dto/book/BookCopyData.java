@@ -1,6 +1,5 @@
-package org.digilib.library.models.dto;
+package org.digilib.library.models.dto.book;
 
-import org.digilib.library.models.Book;
 import org.digilib.library.models.BookCopy;
 import org.digilib.library.models.Status;
 

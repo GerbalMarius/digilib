@@ -1,4 +1,4 @@
-package org.digilib.library.models.dto;
+package org.digilib.library.models.dto.genre;
 
 import org.digilib.library.models.Genre;
 

@@ -18,7 +18,7 @@ public class SpecialCharHandler extends BaseHandler<String> {
     @Override
     public boolean handle(String value, ConstraintValidatorContext context) {
 
-        if (value == null || !SPECIAL_CHAR_PATTERN.matcher(value).matches()) {
+        if (value == null || !SPECIAL_CHAR_PATTERN.matcher(value).find()) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
             return false;

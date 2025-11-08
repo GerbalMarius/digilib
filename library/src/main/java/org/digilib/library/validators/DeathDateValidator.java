@@ -2,7 +2,7 @@ package org.digilib.library.validators;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.digilib.library.models.dto.AuthorUpdateView;
+import org.digilib.library.models.dto.author.AuthorUpdateView;
 
 import java.time.LocalDate;
 
