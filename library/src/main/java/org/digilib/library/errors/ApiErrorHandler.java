@@ -1,5 +1,6 @@
 package org.digilib.library.errors;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -89,12 +91,37 @@ public final class ApiErrorHandler {
                 .body(duplicateEmailErrors);
     }
 
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<Map<String, Object>> handleExpiredJwt(ExpiredJwtException eje){
+        Map<String, Object> expiredJwtErrors = Errors.httpResponseMap(1, HttpStatus.UNAUTHORIZED);
+        expiredJwtErrors.put("message", eje.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(expiredJwtErrors);
+    }
+
+    @ExceptionHandler(ExpiredRefreshTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleExpiredRefreshToken(ExpiredRefreshTokenException eje){
+        Map<String, Object> expiredJwtErrors = Errors.httpResponseMap(2, HttpStatus.UNAUTHORIZED);
+        expiredJwtErrors.put("message", eje.getMessage());
+        expiredJwtErrors.put("claims", eje.getClaims());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(expiredJwtErrors);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, Object>> handleBadCredentials(){
+    public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException bce){
         Map<String, Object> badCredentialsErrors = Errors.httpResponseMap(1, HttpStatus.UNAUTHORIZED);
-        badCredentialsErrors.put("message", "Invalid credentials provided for email or password");
+        badCredentialsErrors.put("message", bce.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(badCredentialsErrors);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthorizationDenied(AuthorizationDeniedException ade){
+        Map<String, Object> authorizationDeniedErrors = Errors.httpResponseMap(1, HttpStatus.FORBIDDEN);
+        authorizationDeniedErrors.put("message", ade.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(authorizationDeniedErrors);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

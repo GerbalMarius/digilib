@@ -3,6 +3,7 @@ package org.digilib.library.services;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.digilib.library.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,12 +13,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.function.Function;
 
 @Slf4j
 @Component
@@ -41,15 +41,17 @@ public class JwtService {
     public String generateAccessToken(UserDetails claimsPrincipal) {
         var now = Instant.now();
 
-        Map<String, Object> claims = HashMap.newHashMap(1);
+        Map<String, Object> claims = HashMap.newHashMap(2);
         List<String> authoritiesList = claimsPrincipal.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
         claims.put("roles", authoritiesList);
+        claims.put("id", ((User)claimsPrincipal).getId());
 
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setSubject(claimsPrincipal.getUsername())
                 .addClaims(claims)
                 .setIssuedAt(Date.from(now))
@@ -58,24 +60,12 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractEmailFromToken(String token) {
+    public <T> T extractFromToken(String token, Function<Claims, T> claimsResolver) {
         Jws<Claims> claimsJws = parseTokenClaims(token);
-        return claimsJws.getBody().getSubject();
+        Claims body = claimsJws.getBody();
+        return claimsResolver.apply(body);
     }
 
-    public List<String> extractRolesFromToken(String token) {
-        Claims claimsJws = parseTokenClaims(token).getBody();
-        Object roles = claimsJws.get("roles");
-
-        if (roles instanceof Collection<?> coll) {
-            return coll.stream()
-                    .map(Objects::toString)
-                    .toList();
-        } else {
-            log.error("Roles claim is not a collection");
-            return List.of();
-        }
-    }
 
     public boolean isValidToken(String token, UserDetails claimsPrincipal) {
        try{
@@ -87,6 +77,16 @@ public class JwtService {
            log.debug("Error parsing token", e);
            return false;
        }
+    }
+
+    public boolean isRefreshValid(String refreshToken) {
+        try {
+            parseTokenClaims(refreshToken);
+            return true;
+        } catch (Exception e) {
+            log.debug("Invalid refresh token", e);
+            return false;
+        }
     }
 
     public boolean isExpired(String token) {
@@ -101,12 +101,14 @@ public class JwtService {
         var now = Instant.now();
 
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setSubject(username)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusSeconds(refreshTlsSeconds)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     private Jws<Claims> parseTokenClaims(String token) {
         JwtParser parser = Jwts.parserBuilder()

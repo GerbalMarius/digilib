@@ -1,9 +1,7 @@
 package org.digilib.library.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,7 +34,7 @@ public final class User implements UserDetails {
     @Column(name = "last_name", length = 100, nullable = false)
     private String lastName;
 
-    @ManyToMany(fetch = FetchType.LAZY,
+    @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_roles",
@@ -44,6 +42,8 @@ public final class User implements UserDetails {
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
     )
     @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Role> roles = new ArrayList<>();
 
     public User() {}
@@ -51,8 +51,8 @@ public final class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
+                .sorted(Comparator.comparingLong(Role::getId))
                 .map(role -> new SimpleGrantedAuthority( "ROLE_" + role.getName()))
-                .sorted(Comparator.comparing(GrantedAuthority::getAuthority))
                 .toList();
     }
 

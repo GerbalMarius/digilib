@@ -21,7 +21,6 @@ public record RegisterDto(
         @Size(min = 5, max = 80)
         String lastName,
 
-        @NotEmpty(message = "password must be provided")
         @Password(minLength = 10, needSpecialChar = true, needDigits = true, needUpperCase = true)
         String password
 ) {

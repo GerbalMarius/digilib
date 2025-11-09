@@ -1,9 +1,7 @@
 package org.digilib.library.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +35,8 @@ public final class Library {
 
     @OneToMany(mappedBy = "library", orphanRemoval = true, cascade = CascadeType.ALL)
     @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<BookCopy> bookCopies = new ArrayList<>();
 
 

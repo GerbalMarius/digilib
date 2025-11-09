@@ -1,11 +1,13 @@
 package org.digilib.library.filters;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.digilib.library.services.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +23,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -43,7 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             String token = auth.substring(7);
-            String userEmail = jwtService.extractEmailFromToken(token);
+            String userEmail = jwtService.extractFromToken(token, Claims::getSubject);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
