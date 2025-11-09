@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -62,10 +60,7 @@ public final class ApiErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException manve){
 
-        Map<String, Object> validationErrors = HashMap.newHashMap(3);
-
-        validationErrors.put("timestamp", Instant.now());
-        validationErrors.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+        Map<String, Object> validationErrors = Errors.httpResponseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
 
         var errors = manve.getBindingResult()
                 .getFieldErrors()
@@ -126,7 +121,7 @@ public final class ApiErrorHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
-        Map<String, Object> errors = Errors.httpResponseMap(3, HttpStatus.UNPROCESSABLE_ENTITY);
+        Map<String, Object> errors = Errors.httpResponseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
 
         var violations = ex.getConstraintViolations()
                 .stream()
@@ -137,10 +132,6 @@ public final class ApiErrorHandler {
                 );
 
         errors.put("errors", violations);
-
-
-        errors.put("timestamp", Instant.now());
-        errors.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(errors);
