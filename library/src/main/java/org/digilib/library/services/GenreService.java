@@ -1,7 +1,7 @@
 package org.digilib.library.services;
 
 import lombok.RequiredArgsConstructor;
-import org.digilib.library.errors.ResourceNotFoundException;
+import org.digilib.library.errors.exceptions.ResourceNotFoundException;
 import org.digilib.library.models.Genre;
 import org.digilib.library.models.dto.author.AuthorData;
 import org.digilib.library.models.dto.book.BookData;

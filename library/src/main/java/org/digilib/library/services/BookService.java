@@ -2,7 +2,7 @@ package org.digilib.library.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.digilib.library.errors.ResourceNotFoundException;
+import org.digilib.library.errors.exceptions.ResourceNotFoundException;
 import org.digilib.library.models.Author;
 import org.digilib.library.models.Book;
 import org.digilib.library.models.Genre;

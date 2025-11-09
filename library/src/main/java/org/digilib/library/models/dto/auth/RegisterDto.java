@@ -14,14 +14,16 @@ public record RegisterDto(
         String email,
 
         @NotEmpty(message = "first name must be provided")
-        @Size(min = 5, max = 80)
+        @Size(min = 3, max = 80)
         String firstName,
 
         @NotEmpty(message = "last name must be provided")
-        @Size(min = 5, max = 80)
+        @Size(min = 3, max = 80)
         String lastName,
 
         @Password(minLength = 10, needSpecialChar = true, needDigits = true, needUpperCase = true)
-        String password
+        String password,
+
+        String adminCode
 ) {
 }

@@ -1,4 +1,4 @@
-package org.digilib.library.errors;
+package org.digilib.library.errors.exceptions;
 
 public class DuplicateEmailException extends RuntimeException {
     public DuplicateEmailException(String message) {

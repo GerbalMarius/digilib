@@ -2,7 +2,7 @@ package org.digilib.library.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.digilib.library.errors.InvalidRequestParamException;
+import org.digilib.library.errors.exceptions.InvalidRequestParamException;
 import org.digilib.library.models.BookCopy;
 import org.digilib.library.models.Library;
 import org.digilib.library.models.dto.book.BookCopyCreateView;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -56,6 +57,7 @@ public class LibraryController {
                 .body(LibraryData.wrapLibrary(libraryService.findById(id)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/libraries")
     public ResponseEntity<LibraryData> createNewLibrary(@RequestBody @Valid LibraryCreateView newLibrary){
 
@@ -63,6 +65,7 @@ public class LibraryController {
                 .body(libraryService.createNewLibrary(newLibrary));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/libraries/{id}")
     public ResponseEntity<?> deleteLibraryById(@PathVariable long id){
         libraryService.deleteLibrary(id);
@@ -91,6 +94,7 @@ public class LibraryController {
 
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @PostMapping("/libraries/{id}/books")
     public ResponseEntity<BookCopyData> addLibraryBook(@PathVariable long id,
                                                        @RequestBody @Valid BookCopyCreateView newBookCopy) {
@@ -100,6 +104,7 @@ public class LibraryController {
                 .body(libraryService.addBookCopyTo(library, newBookCopy));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @PatchMapping("/libraries/{libraryId}/books/{bookId}")
     public ResponseEntity<BookCopyData> updateLibraryBook(@PathVariable long libraryId,
                                                           @PathVariable long bookId,
@@ -110,6 +115,7 @@ public class LibraryController {
         return ResponseEntity.ok(libraryService.updateBookCopy(library, bookId, updateData));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @DeleteMapping("/libraries/{libraryId}/books/{bookId}")
     public ResponseEntity<?> deleteLibraryBook(@PathVariable long libraryId,
                                                @PathVariable long bookId) {

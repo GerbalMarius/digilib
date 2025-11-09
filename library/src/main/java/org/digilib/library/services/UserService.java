@@ -1,13 +1,16 @@
 package org.digilib.library.services;
 
 import lombok.RequiredArgsConstructor;
-import org.digilib.library.errors.DuplicateEmailException;
+import org.digilib.library.errors.exceptions.DuplicateEmailException;
+import org.digilib.library.errors.exceptions.ResourceNotFoundException;
 import org.digilib.library.models.Role;
 import org.digilib.library.models.User;
 import org.digilib.library.models.dto.auth.RegisterDto;
-import org.digilib.library.models.dto.auth.UserData;
+import org.digilib.library.models.dto.user.UserData;
 import org.digilib.library.repositories.RoleRepository;
 import org.digilib.library.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,5 +42,35 @@ public class UserService{
                 .build();
 
         return UserData.wrapUser(userRepository.save(user));
+    }
+
+    public Page<UserData> findAll(long currentUserId, Pageable pageable){
+        return userRepository.findAllByIdNot(currentUserId, pageable)
+                .map(UserData::wrapUser);
+    }
+
+    public void disableUser(long userId, long currentUserId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> ResourceNotFoundException.of(User.class, userId));
+
+        if(user.getId() == currentUserId) {
+            throw new IllegalArgumentException("The current user cannot disable himself");
+        }
+
+        userRepository.updateDisabled(userId, true);
+
+    }
+
+    public void enableUser(long userId, long currentUserId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> ResourceNotFoundException.of(User.class, userId));
+
+        if(user.getId() == currentUserId) {
+            throw new IllegalArgumentException("The current user cannot enable himself");
+        }
+
+        userRepository.updateDisabled(userId, false);
+
     }
 }

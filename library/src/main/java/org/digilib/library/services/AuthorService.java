@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.digilib.library.errors.ResourceNotFoundException;
+import org.digilib.library.errors.exceptions.ResourceNotFoundException;
 import org.digilib.library.models.Author;
 import org.digilib.library.models.Genre;
 import org.digilib.library.models.dto.author.AuthorCreateView;

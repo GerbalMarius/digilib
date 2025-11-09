@@ -13,8 +13,7 @@ import java.time.LocalDate;
 @DeathDate
 public class AuthorUpdateView {
 
-    // getters / setters
-    // optional fields for PATCH
+
     private LocalDate birthDate;
     private LocalDate deathDate;
     private String firstName;

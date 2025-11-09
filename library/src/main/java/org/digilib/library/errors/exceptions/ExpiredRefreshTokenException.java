@@ -1,4 +1,4 @@
-package org.digilib.library.errors;
+package org.digilib.library.errors.exceptions;
 
 import io.jsonwebtoken.Claims;
 import lombok.Getter;

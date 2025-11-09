@@ -2,11 +2,11 @@ package org.digilib.library.services;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.digilib.library.errors.ExpiredRefreshTokenException;
+import org.digilib.library.errors.exceptions.ExpiredRefreshTokenException;
 import org.digilib.library.models.User;
 import org.digilib.library.models.dto.auth.AuthData;
 import org.digilib.library.models.dto.auth.LoginDto;
-import org.digilib.library.models.dto.auth.UserData;
+import org.digilib.library.models.dto.user.UserData;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

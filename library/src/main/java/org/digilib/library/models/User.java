@@ -34,6 +34,9 @@ public final class User implements UserDetails {
     @Column(name = "last_name", length = 100, nullable = false)
     private String lastName;
 
+    @Column(name = "is_disabled", nullable = false)
+    private boolean isDisabled = false;
+
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
@@ -54,6 +57,11 @@ public final class User implements UserDetails {
                 .sorted(Comparator.comparingLong(Role::getId))
                 .map(role -> new SimpleGrantedAuthority( "ROLE_" + role.getName()))
                 .toList();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return !isDisabled;
     }
 
     @Override

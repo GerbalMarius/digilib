@@ -4,12 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.digilib.library.errors.InvalidRequestParamException;
+import org.digilib.library.errors.exceptions.InvalidRequestParamException;
 import org.digilib.library.models.Book;
 import org.digilib.library.models.dto.book.BookCreateView;
 import org.digilib.library.models.dto.book.BookData;
 import org.digilib.library.models.dto.book.BookUpdateView;
-import org.digilib.library.errors.ResourceNotFoundException;
+import org.digilib.library.errors.exceptions.ResourceNotFoundException;
 
 import org.digilib.library.services.BookService;
 import org.digilib.library.validators.IsbnValidator;
@@ -36,7 +36,6 @@ public class BookController {
 
     private final BookService bookService;
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @GetMapping("/books")
     public ResponseEntity<Page<BookData>> getAllBooks(
             @RequestParam(name = "page") int pageNumber,
@@ -59,6 +58,7 @@ public class BookController {
                 .body(bookPage.map(BookData::wrapBook));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @PostMapping("/books")
     public ResponseEntity<BookData> createBook(@RequestBody @Valid BookCreateView creationData) {
 
@@ -82,8 +82,10 @@ public class BookController {
                 .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @PatchMapping("/books/{isbn}")
-    public ResponseEntity<BookData> updateBook(@PathVariable String isbn, @RequestBody @Valid BookUpdateView updateData) {
+    public ResponseEntity<BookData> updateBook(@PathVariable String isbn,
+                                               @RequestBody @Valid BookUpdateView updateData) {
 
         Book existing = bookService.findByIsbn(isbn)
                 .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
@@ -94,6 +96,7 @@ public class BookController {
         return ResponseEntity.ok(BookData.wrapBook(updated));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @DeleteMapping("/books/{isbn}")
     public ResponseEntity<?> deleteBook(@PathVariable String isbn) {
         InvalidRequestParamException.throwIf(isbn, "isbn", s -> !IsbnValidator.isValidIsbn13(s));

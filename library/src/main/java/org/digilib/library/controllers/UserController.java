@@ -1,21 +1,72 @@
 package org.digilib.library.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.digilib.library.errors.exceptions.InvalidRequestParamException;
 import org.digilib.library.models.User;
-import org.digilib.library.models.dto.auth.UserData;
+import org.digilib.library.models.dto.user.UserData;
+import org.digilib.library.services.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.digilib.library.LibraryApplication.PAGE_SIZE;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
+
+    private final UserService userService;
 
     @GetMapping("/me")
     public ResponseEntity<UserData> getCurrentUser(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(UserData.wrapUser(user));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<Page<UserData>> getAllUsers(@AuthenticationPrincipal User currentUser,
+                                                      @RequestParam(name = "page") int pageNumber,
+                                                      @RequestParam(name = "sorts") String[] sorts){
+
+        InvalidRequestParamException.notPositivePage(pageNumber);
+
+        InvalidRequestParamException.notValidSorts(sorts, User.class);
+
+        var pageable = PageRequest.of(
+                pageNumber - 1,
+                PAGE_SIZE,
+                Sort.by(sorts)
+        );
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePrivate())
+                .body(userService.findAll(currentUser.getId(), pageable));
+
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}/disable")
+    public ResponseEntity<?> disableUserById(@AuthenticationPrincipal User currentUser,
+                                             @PathVariable long id) {
+        userService.disableUser(id, currentUser.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/enable")
+    public ResponseEntity<?> enableUserById(@AuthenticationPrincipal User currentUser,
+                                            @PathVariable long id) {
+        userService.enableUser(id, currentUser.getId());
+        return ResponseEntity.noContent().build();
     }
 }

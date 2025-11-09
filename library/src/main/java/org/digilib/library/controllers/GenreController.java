@@ -3,7 +3,7 @@ package org.digilib.library.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.digilib.library.errors.InvalidRequestParamException;
+import org.digilib.library.errors.exceptions.InvalidRequestParamException;
 import org.digilib.library.models.Author;
 import org.digilib.library.models.Book;
 import org.digilib.library.models.Genre;
@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -47,7 +48,6 @@ public class GenreController {
                 .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
                 .body(genreService.findAll());
     }
-
 
     @GetMapping("/genres/{id}")
     public ResponseEntity<GenreData> getGenre(@PathVariable long id) {
@@ -135,18 +135,21 @@ public class GenreController {
                 .body(bookPage);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @PostMapping("/genres")
     public ResponseEntity<GenreData> createGenre(@RequestBody @Valid GenreCreateView genreCreateData) {
         return ResponseEntity.created(URI.create(BACK_URL + "/api/genres"))
                 .body(genreService.createGenre(genreCreateData));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @PutMapping("/genres/{id}")
     public ResponseEntity<GenreData> updateGenre(@PathVariable long id,
                                                  @RequestBody @Valid GenreUpdateView genreUpdateData) {
         return ResponseEntity.ok(genreService.updateGenre(id, genreUpdateData));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @DeleteMapping("/genres/{id}")
     public ResponseEntity<?> deleteGenre(@PathVariable long id) {
         genreService.deleteGenre(id);
