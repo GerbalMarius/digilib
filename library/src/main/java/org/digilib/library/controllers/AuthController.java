@@ -12,9 +12,9 @@ import org.digilib.library.models.dto.user.UserData;
 
 import org.digilib.library.services.AuthService;
 import org.digilib.library.services.UserService;
+import org.digilib.library.utils.Cookies;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +61,7 @@ public class AuthController {
                                                    HttpServletResponse response) {
         var auth = authService.authenticateUser(loginData);
 
-        setRefreshCookie(response, auth.refresh());
+        Cookies.setRefreshCookie(response, auth.refresh());
 
         return ResponseEntity.ok()
                 .body(LoginResponse.of(auth.access(), auth.user()));
@@ -69,45 +69,24 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refreshToken(HttpServletResponse response,
-                                                      @CookieValue("refresh_token") String refreshToken) {
+                                                      @CookieValue(Cookies.REFRESH_COOKIE) String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .build();
         }
+
         var auth = authService.refreshToken(refreshToken);
 
-        setRefreshCookie(response, auth.refresh());
+        Cookies.setRefreshCookie(response, auth.refresh());
         return ResponseEntity.ok(LoginResponse.of(auth.access(), auth.user()));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        clearRefreshCookie(response);
+        Cookies.clearRefreshCookie(response);
 
         return ResponseEntity.noContent()
                 .build();
     }
 
-    private void setRefreshCookie(HttpServletResponse res, String value) {
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", value)
-                .httpOnly(true)
-                .secure(true)
-                .path("/api/auth")
-                .maxAge(7 * 24 * 60 * 60)
-                .sameSite("None")
-                .build();
-
-        res.addHeader("Set-Cookie", cookie.toString());
-    }
-    private void clearRefreshCookie(HttpServletResponse res) {
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
-                .httpOnly(true)
-                .secure(true)
-                .path("/api/auth")
-                .maxAge(0)
-                .sameSite("None")
-                .build();
-
-        res.addHeader("Set-Cookie", cookie.toString());
-    }
 }
