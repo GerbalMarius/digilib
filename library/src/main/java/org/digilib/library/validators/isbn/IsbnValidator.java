@@ -1,4 +1,4 @@
-package org.digilib.library.validators;
+package org.digilib.library.validators.isbn;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -19,6 +19,8 @@ public class IsbnValidator implements ConstraintValidator<Isbn, String> {
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (value == null || value.isBlank()) return true;
+
         String normalized = value;
         if (allowHyphensAndSpaces) {
             normalized = value.replaceAll("[-\\s]", "");

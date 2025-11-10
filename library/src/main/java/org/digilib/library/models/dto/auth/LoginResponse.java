@@ -1,15 +1,11 @@
 package org.digilib.library.models.dto.auth;
 
-import org.digilib.library.models.dto.user.UserData;
-
 public record LoginResponse(
-        String accessToken,
-        UserData user
+        String accessToken
 ) {
-    public static LoginResponse of(String accessToken, UserData user) {
+    public static LoginResponse of(String accessToken) {
         return new LoginResponse(
-                accessToken,
-                user
+                accessToken
         );
     }
 }

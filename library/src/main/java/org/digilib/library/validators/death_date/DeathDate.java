@@ -1,7 +1,8 @@
-package org.digilib.library.validators;
+package org.digilib.library.validators.death_date;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+
 import java.lang.annotation.*;
 
 @Target({ ElementType.TYPE })

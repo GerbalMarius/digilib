@@ -3,7 +3,7 @@ package org.digilib.library.models.dto.author;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import org.digilib.library.validators.DeathDate;
+import org.digilib.library.validators.death_date.DeathDate;
 
 
 import java.time.LocalDate;

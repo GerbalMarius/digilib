@@ -1,10 +1,12 @@
 package org.digilib.library.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.digilib.library.errors.exceptions.InvalidRequestParamException;
 import org.digilib.library.models.User;
 import org.digilib.library.models.dto.user.UserData;
+import org.digilib.library.models.dto.user.UserUpdate;
 import org.digilib.library.services.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +32,13 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserData> getCurrentUser(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(UserData.wrapUser(user));
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<UserData> updateCurrentUser(@AuthenticationPrincipal User user,
+                                                      @RequestBody @Valid UserUpdate userUpdate) {
+        long id = user.getId();
+        return ResponseEntity.ok(userService.updateUser(id, userUpdate));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

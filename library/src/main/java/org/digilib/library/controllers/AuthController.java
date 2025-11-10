@@ -64,7 +64,7 @@ public class AuthController {
         Cookies.setRefreshCookie(response, auth.refresh());
 
         return ResponseEntity.ok()
-                .body(LoginResponse.of(auth.access(), auth.user()));
+                .body(LoginResponse.of(auth.access()));
     }
 
     @PostMapping("/refresh")
@@ -78,7 +78,7 @@ public class AuthController {
         var auth = authService.refreshToken(refreshToken);
 
         Cookies.setRefreshCookie(response, auth.refresh());
-        return ResponseEntity.ok(LoginResponse.of(auth.access(), auth.user()));
+        return ResponseEntity.ok(LoginResponse.of(auth.access()));
     }
 
     @PostMapping("/logout")

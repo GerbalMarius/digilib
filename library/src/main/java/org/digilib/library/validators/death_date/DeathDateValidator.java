@@ -1,4 +1,4 @@
-package org.digilib.library.validators;
+package org.digilib.library.validators.death_date;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

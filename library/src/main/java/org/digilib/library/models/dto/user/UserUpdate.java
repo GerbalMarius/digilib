@@ -1,36 +1,39 @@
-package org.digilib.library.models.dto.auth;
+package org.digilib.library.models.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import org.digilib.library.validators.password.Password;
 import org.digilib.library.validators.password.PasswordMatches;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @PasswordMatches
-public record RegisterDto(
-
-        @NotEmpty(message = "email must be provided")
+public record UserUpdate(
         @Email(regexp = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@"
                 + "[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$",
                 message = "enter a valid email")
         String email,
 
-        @NotEmpty(message = "first name must be provided")
         @Size(min = 3, max = 80)
         String firstName,
 
-        @NotEmpty(message = "last name must be provided")
         @Size(min = 3, max = 80)
         String lastName,
 
-        @NotBlank(message = "password must be provided")
+
         @Password(minLength = 10, needSpecialChar = true, needDigits = true, needUpperCase = true)
         String password,
 
-        @NotBlank(message = "password confirmation must be provided")
-        String passwordConfirmation,
-
-        String adminCode
+        String passwordConfirmation
 ) {
+
+    @AssertTrue(message = "At least one field must be provided for update")
+    @SuppressWarnings("unused")
+    public boolean isAtLeastOneFieldProvided() {
+        return email != null
+                || firstName != null
+                || lastName != null
+                || password != null;
+    }
 }

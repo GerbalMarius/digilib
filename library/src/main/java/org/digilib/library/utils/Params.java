@@ -3,7 +3,7 @@ package org.digilib.library.utils;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Params {
+public final class Params {
     private Params(){}
 
     public static <T> void setIfPresent(T item, Consumer<? super T> setter) {

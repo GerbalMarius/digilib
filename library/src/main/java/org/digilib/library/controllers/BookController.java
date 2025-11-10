@@ -12,7 +12,7 @@ import org.digilib.library.models.dto.book.BookUpdateView;
 import org.digilib.library.errors.exceptions.ResourceNotFoundException;
 
 import org.digilib.library.services.BookService;
-import org.digilib.library.validators.IsbnValidator;
+import org.digilib.library.validators.isbn.IsbnValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -86,6 +86,8 @@ public class BookController {
     @PatchMapping("/books/{isbn}")
     public ResponseEntity<BookData> updateBook(@PathVariable String isbn,
                                                @RequestBody @Valid BookUpdateView updateData) {
+
+        InvalidRequestParamException.throwIf(isbn, "isbn", s -> !IsbnValidator.isValidIsbn13(s));
 
         Book existing = bookService.findByIsbn(isbn)
                 .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));

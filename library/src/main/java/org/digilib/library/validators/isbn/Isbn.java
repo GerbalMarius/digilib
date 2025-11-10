@@ -1,4 +1,4 @@
-package org.digilib.library.validators;
+package org.digilib.library.validators.isbn;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

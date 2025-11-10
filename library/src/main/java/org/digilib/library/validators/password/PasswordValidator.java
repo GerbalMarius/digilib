@@ -22,7 +22,7 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
         List<ConstraintHandler<String>> handlers = new ArrayList<>(4);
 
         if (minLength > 0) {
-            handlers.add(new MinLengthHandler(minLength, "Password must be at least " + minLength + " characters long"));
+            handlers.add(new MinLengthHandler(minLength, "Password must be at least " + minLength + " non-whitespace characters long"));
         }
         if (needDigits) {
             handlers.add(new DigitHandler("Password must contain at least one digit"));
@@ -48,6 +48,9 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (handlerHead == null) return true;
-        return handlerHead.handle(value, context);
+
+        if (value == null || value.isBlank()) return true;
+
+        return handlerHead.handle(value.trim(), context);
     }
 }

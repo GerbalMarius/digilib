@@ -3,7 +3,7 @@ package org.digilib.library.models.dto.book;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import org.digilib.library.validators.Isbn;
+import org.digilib.library.validators.isbn.Isbn;
 
 public record BookCopyCreateView(
 

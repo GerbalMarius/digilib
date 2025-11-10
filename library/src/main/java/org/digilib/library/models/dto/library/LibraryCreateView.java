@@ -5,7 +5,7 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import org.digilib.library.validators.IsbnValidator;
+import org.digilib.library.validators.isbn.IsbnValidator;
 
 import java.util.List;
 

@@ -7,6 +7,7 @@ import org.digilib.library.models.Role;
 import org.digilib.library.models.User;
 import org.digilib.library.models.dto.auth.RegisterDto;
 import org.digilib.library.models.dto.user.UserData;
+import org.digilib.library.models.dto.user.UserUpdate;
 import org.digilib.library.repositories.RoleRepository;
 import org.digilib.library.repositories.UserRepository;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static org.digilib.library.utils.Params.setIfPresent;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +40,7 @@ public class UserService{
                 .email(registerData.email())
                 .firstName(registerData.firstName())
                 .lastName(registerData.lastName())
-                .password(passwordEncoder.encode(registerData.password()))
+                .password(passwordEncoder.encode(registerData.password().trim()))
                 .roles(actualRoles)
                 .build();
 
@@ -58,7 +61,7 @@ public class UserService{
             throw new IllegalArgumentException("The current user cannot disable himself");
         }
 
-        userRepository.updateDisabled(userId, true);
+        userRepository.updateDisabled(user.getId(), true);
 
     }
 
@@ -70,7 +73,19 @@ public class UserService{
             throw new IllegalArgumentException("The current user cannot enable himself");
         }
 
-        userRepository.updateDisabled(userId, false);
+        userRepository.updateDisabled(user.getId(), false);
+    }
 
+    public UserData updateUser(long userId, UserUpdate userUpdate) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> ResourceNotFoundException.of(User.class, userId));
+
+
+        setIfPresent(userUpdate.firstName(), String::trim, user::setFirstName);
+        setIfPresent(userUpdate.lastName(), String::trim, user::setLastName);
+        setIfPresent(userUpdate.email(), String::trim, user::setEmail);
+        setIfPresent(userUpdate.password(), String::trim, password -> user.setPassword(passwordEncoder.encode(password)));
+
+        return UserData.wrapUser(userRepository.save(user));
     }
 }
