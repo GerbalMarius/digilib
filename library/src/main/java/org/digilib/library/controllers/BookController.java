@@ -89,7 +89,9 @@ public class BookController {
 
         InvalidRequestParamException.throwIf(isbn, "isbn", s -> !IsbnValidator.isValidIsbn13(s));
 
-        Book existing = bookService.findByIsbn(isbn)
+        String normalised = isbn.replaceAll("[-\\s]", "");
+
+        Book existing = bookService.findByIsbn(normalised)
                 .orElseThrow(() -> ResourceNotFoundException.of(Book.class, isbn));
 
         Book updated = bookService.updateBookFrom(existing, updateData);
