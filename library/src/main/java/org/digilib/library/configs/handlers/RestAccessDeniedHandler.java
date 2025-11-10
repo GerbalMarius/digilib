@@ -26,7 +26,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
         HttpErrorResponse responseBody = HttpErrorResponse.of(
                 HttpStatus.FORBIDDEN,
-                "You do not have permission to perform this action.",
+                "Insufficient permissions to perform this action",
                 request.getRequestURI()
                 );
 
