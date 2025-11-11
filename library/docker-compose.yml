@@ -8,6 +8,50 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - PORT=8081
-      - JAVA_OPTS=
+      # Spring application
+      SPRING_APPLICATION_NAME: library
+
+      # Server utils
+      SERVER_PORT: 8081
+
+      # Multipart
+      SPRING_SERVLET_MULTIPART_ENABLED: "true"
+
+      # Datasource
+      SPRING_DATASOURCE_URL: jdbc:postgresql://marius-db.postgres.database.azure.com:5432/postgres?sslmode=require
+      SPRING_DATASOURCE_USERNAME: maramb
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+
+      # Payload encoding
+      SERVER_SERVLET_ENCODING_CHARSET: UTF-8
+      SERVER_SERVLET_ENCODING_ENABLED: "true"
+      SERVER_SERVLET_ENCODING_FORCE: "true"
+
+      # SQL config
+      SPRING_SQL_INIT_MODE: always
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      # Spring security
+      SPRING_SECURITY_USER_NAME: user
+      SPRING_SECURITY_USER_PASSWORD: password
+
+      # HTTP session
+      SERVER_SERVLET_SESSION_TIMEOUT: 30m
+
+      # Query logging
+      LOGGING_LEVEL_NET_TTDDYY_DSPROXY_LISTENER: debug
+
+      # Additional admin config
+      SECURITY_ADMIN_SIGNUP_CODE: ${ADMIN_SIGNUP_CODE}
+
+      # JWT
+      SECURITY_JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      SECURITY_JWT_TOKEN_EXPIRATION_MINUTES: 15
+      SECURITY_JWT_REFRESH_TOKEN_EXPIRATION_DAYS: 7
+
+      # App port (optional)
+      PORT: 8081
     restart: unless-stopped
