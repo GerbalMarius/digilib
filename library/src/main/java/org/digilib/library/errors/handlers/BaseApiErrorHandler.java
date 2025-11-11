@@ -1,12 +1,32 @@
 package org.digilib.library.errors.handlers;
 
-import org.digilib.library.errors.Errors;
+
 import org.springframework.http.HttpStatus;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class BaseApiErrorHandler {
-    protected Map<String, Object> httpMap(int code, HttpStatus status) {
-        return Errors.httpResponseMap(code, status);
+
+    /**
+     * Creates a hashMap with base capacity for timestamp, status code, status name.
+     * @param additionalCapacity capacity for additional params to be added later.
+     * @param status http status to create this map with.
+     * @return  hashMap with status and timestamp filled in. This map is modifiable.
+     */
+    protected Map<String, Object> httpMap(int additionalCapacity, HttpStatus status) {
+        HashMap<String, Object> mappedErrors
+                = HashMap.newHashMap(
+                Math.max(0, additionalCapacity) + 3
+        );
+
+        mappedErrors.put("timestamp", Instant.now());
+
+        mappedErrors.put("status", status.value());
+
+        mappedErrors.put("error", status);
+
+        return mappedErrors;
     }
 }

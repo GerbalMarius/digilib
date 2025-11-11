@@ -6,7 +6,7 @@ import java.time.Instant;
 
 import static org.digilib.library.LibraryApplication.BACK_URL;
 
-public record HttpErrorResponse(
+ record HttpErrorResponse(
         Instant timeStamp,
         int status,
         String error,
@@ -15,7 +15,7 @@ public record HttpErrorResponse(
 
         String path
 ) {
-    public static HttpErrorResponse of(HttpStatus httpStatus, String message, String path) {
+     static HttpErrorResponse of(HttpStatus httpStatus, String message, String path) {
         return new HttpErrorResponse(
                 Instant.now(),
                 httpStatus.value(),

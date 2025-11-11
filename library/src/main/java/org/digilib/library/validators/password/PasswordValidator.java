@@ -5,9 +5,6 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.digilib.library.validators.chain.ConstraintHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PasswordValidator implements ConstraintValidator<Password, String> {
 
     private ConstraintHandler<String> handlerHead;
@@ -19,27 +16,31 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
         boolean needUpperCase = a.needUpperCase();
         boolean needSpecialChar = a.needSpecialChar();
 
-        List<ConstraintHandler<String>> handlers = new ArrayList<>(4);
+        @SuppressWarnings("unchecked")
+        ConstraintHandler<String>[] handlers = (ConstraintHandler<String>[]) new ConstraintHandler[4];
+
+        int size = 0;
 
         if (minLength > 0) {
-            handlers.add(new MinLengthHandler(minLength, "Password must be at least " + minLength + " non-whitespace characters long"));
+            handlers[size++] = new MinLengthHandler(minLength, "Password must be at least " + minLength + " non-whitespace characters long");
         }
         if (needDigits) {
-            handlers.add(new DigitHandler("Password must contain at least one digit"));
+            handlers[size++] = new DigitHandler("Password must contain at least one digit");
         }
         if (needUpperCase) {
-            handlers.add(new UpperCaseHandler("Password must contain at least one uppercase letter"));
+            handlers[size++] = new UpperCaseHandler("Password must contain at least one uppercase letter");
         }
 
         if (needSpecialChar) {
-            handlers.add(new SpecialCharHandler("Password must contain at least one special character"));
+            handlers[size++] = new SpecialCharHandler("Password must contain at least one special character");
         }
 
-        if (!handlers.isEmpty()) {
-            ConstraintHandler<String> head = handlers.getFirst();
-            ConstraintHandler<String> cursor = head;
-            for (int i = 1; i < handlers.size(); i++) {
-                cursor = cursor.setNext(handlers.get(i));
+        if (size > 0) {
+            ConstraintHandler<String> head = handlers[0];
+
+            var cursor = head;
+            for (int i = 1; i < size; i++) {
+                cursor = cursor.setNext(handlers[i]);
             }
             this.handlerHead = head;
         }
