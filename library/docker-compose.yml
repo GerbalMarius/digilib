@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  digilib:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: digilib:latest
+    container_name: digilib
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - JAVA_OPTS=
+    restart: unless-stopped
