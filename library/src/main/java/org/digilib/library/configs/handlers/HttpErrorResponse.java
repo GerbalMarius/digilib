@@ -4,9 +4,7 @@ import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 
-import static org.digilib.library.LibraryApplication.BACK_URL;
-
- record HttpErrorResponse(
+record HttpErrorResponse(
         Instant timeStamp,
         int status,
         String error,
@@ -21,7 +19,7 @@ import static org.digilib.library.LibraryApplication.BACK_URL;
                 httpStatus.value(),
                 httpStatus.getReasonPhrase(),
                 message,
-                BACK_URL + path
+                path
         );
     }
 }

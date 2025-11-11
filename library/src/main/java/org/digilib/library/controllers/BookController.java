@@ -21,8 +21,8 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -64,7 +64,12 @@ public class BookController {
 
         Book saved = bookService.createBookFrom(creationData);
 
-        return ResponseEntity.created(URI.create(BACK_URL + "/api/books"))
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{isbn}")
+                .buildAndExpand(saved.getIsbn())
+                .toUri();
+
+        return ResponseEntity.created(location)
                 .body(BookData.wrapBook(saved));
     }
 

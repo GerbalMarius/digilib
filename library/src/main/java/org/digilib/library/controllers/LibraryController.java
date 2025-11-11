@@ -18,11 +18,10 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
-import static org.digilib.library.LibraryApplication.BACK_URL;
 import static org.digilib.library.LibraryApplication.PAGE_SIZE;
 
 @RestController
@@ -61,8 +60,15 @@ public class LibraryController {
     @PostMapping("/libraries")
     public ResponseEntity<LibraryData> createNewLibrary(@RequestBody @Valid LibraryCreateView newLibrary){
 
-        return ResponseEntity.created(URI.create(BACK_URL + "/api/libraries"))
-                .body(libraryService.createNewLibrary(newLibrary));
+        LibraryData saved = libraryService.createNewLibrary(newLibrary);
+
+         var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.id())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(saved);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -100,8 +106,16 @@ public class LibraryController {
                                                        @RequestBody @Valid BookCopyCreateView newBookCopy) {
         Library library = libraryService.findById(id);
 
-        return ResponseEntity.created(URI.create(BACK_URL + "/api/libraries/" + id + "/books"))
-                .body(libraryService.addBookCopyTo(library, newBookCopy));
+
+        BookCopyData saved = libraryService.addBookCopyTo(library, newBookCopy);
+
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.id())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(saved);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")

@@ -10,6 +10,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -24,10 +25,12 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=UTF-8");
 
+        String query = Objects.isNull(request.getQueryString()) ? "" : "?" + request.getQueryString();
+
         HttpErrorResponse responseBody = HttpErrorResponse.of(
                 HttpStatus.FORBIDDEN,
                 "Insufficient permissions to perform this action",
-                request.getRequestURI()
+                request.getRequestURL().toString() + query
                 );
 
         String json = objectMapper.writeValueAsString(responseBody);

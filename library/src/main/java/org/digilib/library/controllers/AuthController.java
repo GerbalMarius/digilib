@@ -17,12 +17,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-
-import static org.digilib.library.LibraryApplication.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -40,7 +38,13 @@ public class AuthController {
     @PostMapping("/signUp/user")
     public ResponseEntity<UserData> registerUser(@RequestBody @Valid RegisterDto registerData) {
         UserData registeredUser = userService.signupUser(registerData, List.of("USER"));
-        return ResponseEntity.created(URI.create(BACK_URL + "/api/auth/signUp/user"))
+
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(registeredUser.id())
+                .toUri();
+
+        return ResponseEntity.created(location)
                 .body(registeredUser);
     }
 
@@ -51,8 +55,16 @@ public class AuthController {
             throw new AdminCodeMismatchException("Invalid adminCode");
         }
 
+
+
         UserData registeredUser = userService.signupUser(registerData, List.of("ADMIN"));
-        return ResponseEntity.created(URI.create(BACK_URL + "/api/auth/signUp/admin"))
+
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(registeredUser.id())
+                .toUri();
+
+        return ResponseEntity.created(location)
                 .body(registeredUser);
     }
 

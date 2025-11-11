@@ -18,11 +18,10 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
-import static org.digilib.library.LibraryApplication.BACK_URL;
 import static org.digilib.library.LibraryApplication.PAGE_SIZE;
 
 @RestController
@@ -80,8 +79,15 @@ public class AuthorController {
     @PostMapping("/authors")
     public ResponseEntity<AuthorData> createAuthor(@RequestBody AuthorCreateView authorData){
 
-        return ResponseEntity.created(URI.create(BACK_URL + "/api/authors"))
-                .body(authorService.createFrom(authorData));
+        AuthorData saved = authorService.createFrom(authorData);
+
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.id())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(saved);
     }
 
     @GetMapping("/authors/{id}")

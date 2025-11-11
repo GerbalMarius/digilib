@@ -10,6 +10,7 @@ public class LibraryApplication {
 
     public static final String BACK_URL = "http://localhost:8080";
 
+
     public static final int PAGE_SIZE = 15;
 
     public  static void main(String[] args) {

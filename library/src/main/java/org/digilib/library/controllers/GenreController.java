@@ -21,12 +21,11 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.digilib.library.LibraryApplication.BACK_URL;
 import static org.digilib.library.LibraryApplication.PAGE_SIZE;
 
 @RestController
@@ -138,8 +137,15 @@ public class GenreController {
     @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @PostMapping("/genres")
     public ResponseEntity<GenreData> createGenre(@RequestBody @Valid GenreCreateView genreCreateData) {
-        return ResponseEntity.created(URI.create(BACK_URL + "/api/genres"))
-                .body(genreService.createGenre(genreCreateData));
+        GenreData saved = genreService.createGenre(genreCreateData);
+
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.id())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(saved);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
