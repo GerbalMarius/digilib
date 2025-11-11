@@ -2,11 +2,7 @@
 FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /workspace
 
-# Copy pom first to leverage Docker layer cache
 COPY pom.xml .
-# If you use Maven Wrapper, also:
-# COPY .mvn .mvn
-# COPY mvnw .
 
 RUN mvn -B -ntp -q -e dependency:go-offline
 
