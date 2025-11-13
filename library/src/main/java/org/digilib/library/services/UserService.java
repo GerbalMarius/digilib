@@ -1,7 +1,9 @@
 package org.digilib.library.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.digilib.library.errors.exceptions.DuplicateEmailException;
+import org.digilib.library.errors.exceptions.ForbiddenActionException;
 import org.digilib.library.errors.exceptions.ResourceNotFoundException;
 import org.digilib.library.models.Role;
 import org.digilib.library.models.User;
@@ -10,8 +12,10 @@ import org.digilib.library.models.dto.user.UserData;
 import org.digilib.library.models.dto.user.UserUpdate;
 import org.digilib.library.repositories.RoleRepository;
 import org.digilib.library.repositories.UserRepository;
+import org.digilib.library.utils.Requests;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +25,15 @@ import static org.digilib.library.utils.Params.setIfPresent;
 
 @Service
 @RequiredArgsConstructor
-public class UserService{
+public class UserService {
 
     private final UserRepository userRepository;
 
     private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final HttpServletRequest request;
 
     public UserData signupUser(RegisterDto registerData, List<String> roleNames){
 
@@ -76,9 +82,24 @@ public class UserService{
         userRepository.updateDisabled(user.getId(), false);
     }
 
-    public UserData updateUser(long userId, UserUpdate userUpdate) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> ResourceNotFoundException.of(User.class, userId));
+    public UserData updateUser(User currentUser, long id, UserUpdate userUpdate) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> ResourceNotFoundException.of(User.class, id));
+
+
+        List<String> roles = currentUser.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        if(user.getId() != currentUser.getId() && !roles.contains("ROLE_ADMIN")) {
+
+            throw new ForbiddenActionException(
+                    "Non-admin user's can't modify other user data",
+                    Requests.requestPath(request),
+                    roles
+            );
+        }
+
 
 
         setIfPresent(userUpdate.firstName(), String::trim, user::setFirstName);

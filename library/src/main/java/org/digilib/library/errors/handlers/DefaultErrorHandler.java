@@ -8,13 +8,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
+
+import static org.digilib.library.utils.Requests.responseMap;
+
 @RestControllerAdvice
 @Order() // -- Integer.MAX_VALUE
-public class DefaultErrorHandler extends BaseApiErrorHandler {
+public class DefaultErrorHandler {
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> exceptionFallback(Exception ex) {
-        Map<String, Object> body = httpMap(2, HttpStatus.INTERNAL_SERVER_ERROR);
+        Map<String, Object> body = responseMap(2, HttpStatus.INTERNAL_SERVER_ERROR);
         body.put("message", ex.getMessage());
         body.put("cause", ex.getClass());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);

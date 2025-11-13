@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.digilib.library.errors.exceptions.AdminCodeMismatchException;
 import org.digilib.library.errors.exceptions.ExpiredRefreshTokenException;
+import org.digilib.library.errors.exceptions.ForbiddenActionException;
 import org.digilib.library.utils.Cookies;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -21,14 +22,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
+import static org.digilib.library.utils.Requests.responseMap;
+
 @RestControllerAdvice
 @Order(2)
-public class SecurityErrorHandler extends BaseApiErrorHandler {
+public class SecurityErrorHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException e,
                                                                     HttpServletResponse response) {
-        Map<String, Object> body = httpMap(1, HttpStatus.UNAUTHORIZED);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNAUTHORIZED);
         body.put("message", e.getMessage());
 
         Cookies.clearRefreshCookie(response);
@@ -40,7 +43,7 @@ public class SecurityErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<Map<String, Object>> handleExpiredJwt(ExpiredJwtException e) {
-        Map<String, Object> body = httpMap(1, HttpStatus.UNAUTHORIZED);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNAUTHORIZED);
 
         body.put("message", e.getMessage());
 
@@ -51,7 +54,7 @@ public class SecurityErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<Map<String, Object>> handleUnsecureJwt(SecurityException e) {
-        Map<String, Object> body = httpMap(1, HttpStatus.UNAUTHORIZED);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNAUTHORIZED);
 
         body.put("message", e.getMessage());
 
@@ -62,7 +65,7 @@ public class SecurityErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidJwtSignature(SignatureException e) {
-        Map<String, Object> body = httpMap(1, HttpStatus.UNAUTHORIZED);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNAUTHORIZED);
 
         body.put("message", e.getMessage());
 
@@ -73,7 +76,7 @@ public class SecurityErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(MalformedJwtException.class)
     public ResponseEntity<Map<String, Object>> handleMalformedJwt(MalformedJwtException e) {
-        Map<String, Object> body = httpMap(1, HttpStatus.UNAUTHORIZED);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNAUTHORIZED);
 
         body.put("message", e.getMessage());
 
@@ -83,7 +86,7 @@ public class SecurityErrorHandler extends BaseApiErrorHandler {
     }
     @ExceptionHandler(ExpiredRefreshTokenException.class)
     public ResponseEntity<Map<String, Object>> handleExpiredRefreshToken(ExpiredRefreshTokenException e) {
-        Map<String, Object> body = httpMap(2, HttpStatus.UNAUTHORIZED);
+        Map<String, Object> body = responseMap(2, HttpStatus.UNAUTHORIZED);
         body.put("message", e.getMessage());
         body.put("claims", e.getClaims().toString());
 
@@ -94,7 +97,7 @@ public class SecurityErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(AdminCodeMismatchException.class)
     public ResponseEntity<Map<String, Object>> handleAdminCodeMismatch(AdminCodeMismatchException e) {
-        Map<String, Object> body = httpMap(1, HttpStatus.FORBIDDEN);
+        Map<String, Object> body = responseMap(1, HttpStatus.FORBIDDEN);
         body.put("message", e.getMessage());
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -103,7 +106,7 @@ public class SecurityErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<Map<String, Object>> handleDisabledUser(DisabledException e) {
-        Map<String, Object> body = httpMap(1, HttpStatus.FORBIDDEN);
+        Map<String, Object> body = responseMap(1, HttpStatus.FORBIDDEN);
 
         body.put("message", e.getMessage());
 
@@ -111,9 +114,20 @@ public class SecurityErrorHandler extends BaseApiErrorHandler {
                 .body(body);
     }
 
+    @ExceptionHandler(ForbiddenActionException.class)
+    public ResponseEntity<Map<String, Object>> handleForbiddenAction(ForbiddenActionException e) {
+        Map<String, Object> body = responseMap(3, HttpStatus.FORBIDDEN);
+
+        body.put("message", e.getMessage());
+        body.put("path", e.getRequestUrl());
+        body.put("claims", e.getClaims());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(body);
+    }
+
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAuthorizationDenied(AuthorizationDeniedException e) {
-        Map<String, Object> body = httpMap(1, HttpStatus.FORBIDDEN);
+        Map<String, Object> body = responseMap(1, HttpStatus.FORBIDDEN);
 
         body.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)

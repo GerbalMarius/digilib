@@ -12,22 +12,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static org.digilib.library.utils.Requests.responseMap;
 
 @RestControllerAdvice
 @Order(1)
-public class ValidationErrorHandler extends BaseApiErrorHandler {
+public class ValidationErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException manve){
-        Map<String, Object> body = httpMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
 
         var errors = manve.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
-                        FieldError::getDefaultMessage,
+                        field -> Objects.toString(field.getDefaultMessage()),
                         (a, _) -> a
                 ));
 
@@ -38,7 +41,7 @@ public class ValidationErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
-        Map<String, Object> body = httpMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
 
         var violations = ex.getConstraintViolations()
                 .stream()
@@ -56,7 +59,7 @@ public class ValidationErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Map<String, Object>> handleValidationFallback(ValidationException ve){
-        Map<String, Object> body = httpMap(2, HttpStatus.BAD_REQUEST);
+        Map<String, Object> body = responseMap(2, HttpStatus.BAD_REQUEST);
 
         body.put("message", ve.getMessage());
         body.put("reason", "Malformed request payload");

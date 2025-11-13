@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
+import static org.digilib.library.utils.Requests.responseMap;
+
 @RestControllerAdvice
 @Order(4)
-public class DomainErrorHandler extends BaseApiErrorHandler {
+public class DomainErrorHandler{
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException e){
-        Map<String, Object> body = httpMap(2, HttpStatus.NOT_FOUND);
+        Map<String, Object> body = responseMap(2, HttpStatus.NOT_FOUND);
         body.put("message", e.getMessage());
         body.put("id", e.getId());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -27,7 +29,7 @@ public class DomainErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<Map<String, Object>> handleDuplicateEmail(DuplicateEmailException e){
-        Map<String, Object> body = httpMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
         body.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(body);
@@ -35,7 +37,7 @@ public class DomainErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(InvalidRequestParamException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidRequestParam(InvalidRequestParamException e){
-        Map<String, Object> body = httpMap(3, HttpStatus.BAD_REQUEST);
+        Map<String, Object> body = responseMap(3, HttpStatus.BAD_REQUEST);
         body.put("message", e.getMessage());
         body.put("paramName", e.getParamName());
         body.put("paramValue", e.getParamValue());
@@ -45,14 +47,14 @@ public class DomainErrorHandler extends BaseApiErrorHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException e){
-        Map<String, Object> body = httpMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
         body.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(body);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException e){
-        Map<String, Object> body = httpMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
+        Map<String, Object> body = responseMap(1, HttpStatus.UNPROCESSABLE_ENTITY);
         body.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(body);
     }

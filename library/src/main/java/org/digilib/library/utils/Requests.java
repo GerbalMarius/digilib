@@ -1,13 +1,27 @@
-package org.digilib.library.errors.handlers;
+package org.digilib.library.utils;
 
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BaseApiErrorHandler {
+public final class Requests {
+
+    private Requests(){}
+
+    /**
+     * Returns the request path including query string.
+     * @param request current request.
+     * @return request path including query string, if any, else empty string.
+     */
+    public static String requestPath(HttpServletRequest request) {
+        String query = request.getQueryString() == null ? ""
+                : "?" + request.getQueryString();
+
+       return request.getRequestURL().toString() + query;
+    }
 
     /**
      * Creates a hashMap with base capacity for timestamp, status code, status name.
@@ -15,7 +29,7 @@ public abstract class BaseApiErrorHandler {
      * @param status http status to create this map with.
      * @return  hashMap with status and timestamp filled in. This map is modifiable.
      */
-    protected Map<String, Object> httpMap(int additionalCapacity, HttpStatus status) {
+    public static Map<String, Object> responseMap(int additionalCapacity, HttpStatus status) {
         HashMap<String, Object> mappedErrors
                 = HashMap.newHashMap(
                 Math.max(0, additionalCapacity) + 3

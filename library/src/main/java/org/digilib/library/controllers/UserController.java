@@ -30,16 +30,10 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserData> getCurrentUser(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(UserData.wrapUser(user));
+    public ResponseEntity<UserData> getCurrentUser(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(UserData.wrapUser(currentUser));
     }
 
-    @PatchMapping("/me")
-    public ResponseEntity<UserData> updateCurrentUser(@AuthenticationPrincipal User user,
-                                                      @RequestBody @Valid UserUpdate userUpdate) {
-        long id = user.getId();
-        return ResponseEntity.ok(userService.updateUser(id, userUpdate));
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
@@ -61,6 +55,14 @@ public class UserController {
                 .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePrivate())
                 .body(userService.findAll(currentUser.getId(), pageable));
 
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserData> updateUser(@AuthenticationPrincipal User currentUser,
+                                               @PathVariable long id,
+                                               @RequestBody @Valid UserUpdate userUpdate) {
+
+        return ResponseEntity.ok(userService.updateUser(currentUser, id, userUpdate));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
