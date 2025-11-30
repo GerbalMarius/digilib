@@ -14,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -31,7 +33,9 @@ public class AuthService {
         String access = jwtService.generateAccessToken(principal);
         String refresh = jwtService.generateRefreshToken(principal.getUsername());
 
-        return new AuthData(access, refresh, UserData.wrapUser(principal));
+        List<String> roles = jwtService.extractRolesFromToken(access);
+
+        return new AuthData(access, refresh, UserData.wrapUser(principal, roles));
 
     }
 
@@ -46,7 +50,9 @@ public class AuthService {
         String access = jwtService.generateAccessToken(principal);
         String refresh = jwtService.generateRefreshToken(principal.getUsername());
 
-        return new AuthData(access, refresh, UserData.wrapUser(principal));
+        List<String> roles = jwtService.extractRolesFromToken(access);
+
+        return new AuthData(access, refresh, UserData.wrapUser(principal, roles));
     }
 
     public boolean isExpiredToken(String token) {

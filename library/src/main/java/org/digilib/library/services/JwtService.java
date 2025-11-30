@@ -66,6 +66,17 @@ public class JwtService {
         return claimsResolver.apply(body);
     }
 
+    @SuppressWarnings("unchecked")
+    public List<String> extractRolesFromToken(String token) {
+        return extractFromToken(token, claims -> {
+            Object authorities = claims.get("roles");
+            if (authorities instanceof List) {
+                return (List<String>) authorities;
+            }
+            return List.of();
+        });
+    }
+
 
     public boolean isValidToken(String token, UserDetails claimsPrincipal) {
        try{

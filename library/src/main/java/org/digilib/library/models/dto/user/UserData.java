@@ -2,18 +2,23 @@ package org.digilib.library.models.dto.user;
 
 import org.digilib.library.models.User;
 
+import java.util.List;
+
 public record UserData(
         long id,
         String email,
         String firstName,
-        String lastName
+        String lastName,
+
+        List<String> roles
 ) {
-    public static UserData wrapUser(User user) {
+    public static UserData wrapUser(User user, List<String> roles) {
         return new UserData(
                 user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
-                user.getLastName()
+                user.getLastName(),
+                roles
         );
     }
 }

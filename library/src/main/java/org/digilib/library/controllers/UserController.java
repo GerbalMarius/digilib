@@ -7,6 +7,7 @@ import org.digilib.library.errors.exceptions.InvalidRequestParamException;
 import org.digilib.library.models.User;
 import org.digilib.library.models.dto.user.UserData;
 import org.digilib.library.models.dto.user.UserUpdate;
+import org.digilib.library.services.JwtService;
 import org.digilib.library.services.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.digilib.library.LibraryApplication.PAGE_SIZE;
@@ -28,10 +30,14 @@ import static org.digilib.library.LibraryApplication.PAGE_SIZE;
 public class UserController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserData> getCurrentUser(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(UserData.wrapUser(currentUser));
+    public ResponseEntity<UserData> getCurrentUser(@AuthenticationPrincipal User currentUser,
+                                                   @RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.replace("Bearer ", "");
+        List<String> roles = jwtService.extractRolesFromToken(token);
+        return ResponseEntity.ok(UserData.wrapUser(currentUser, roles));
     }
 
 

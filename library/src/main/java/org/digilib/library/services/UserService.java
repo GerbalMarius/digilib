@@ -50,12 +50,12 @@ public class UserService {
                 .roles(actualRoles)
                 .build();
 
-        return UserData.wrapUser(userRepository.save(user));
+        return UserData.wrapUser(userRepository.save(user), roleNames);
     }
 
     public Page<UserData> findAll(long currentUserId, Pageable pageable){
         return userRepository.findAllByIdNot(currentUserId, pageable)
-                .map(UserData::wrapUser);
+                .map(user -> UserData.wrapUser(user, List.of()));
     }
 
     public void disableUser(long userId, long currentUserId) {
@@ -107,6 +107,6 @@ public class UserService {
         setIfPresent(userUpdate.email(), String::trim, user::setEmail);
         setIfPresent(userUpdate.password(), String::trim, password -> user.setPassword(passwordEncoder.encode(password)));
 
-        return UserData.wrapUser(userRepository.save(user));
+        return UserData.wrapUser(userRepository.save(user), roles);
     }
 }
