@@ -2,11 +2,7 @@ package org.digilib.library.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -62,6 +58,12 @@ public final class Book {
     )
     @Builder.Default
     private List<Author> authors =  new ArrayList<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Reservation> reservations = new ArrayList<>();
 
     @Column(name = "created_at")
     private Instant createdAt;

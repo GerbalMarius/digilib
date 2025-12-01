@@ -49,6 +49,12 @@ public final class User implements UserDetails {
     @EqualsAndHashCode.Exclude
     private List<Role> roles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Reservation> reservations = new ArrayList<>();
+
     public User() {}
 
     @Override

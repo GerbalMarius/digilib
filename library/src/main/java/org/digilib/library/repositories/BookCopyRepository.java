@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BookCopyRepository extends JpaRepository<BookCopy,Long> {
@@ -25,4 +26,12 @@ public interface BookCopyRepository extends JpaRepository<BookCopy,Long> {
             """,
             nativeQuery = true)
     Optional<String> findMaxBarcodeByLibraryId(@Param("libraryId") long libraryId);
+
+    @Query("""
+        select bc
+        from BookCopy bc
+        join fetch bc.library l
+        where bc.book.isbn = :isbn
+        """)
+    List<BookCopy> findByBookIsbnWithLibrary(@Param("isbn") String isbn);
 }

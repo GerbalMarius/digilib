@@ -11,6 +11,8 @@ import org.digilib.library.models.dto.book.BookData;
 import org.digilib.library.models.dto.book.BookUpdateView;
 import org.digilib.library.errors.exceptions.ResourceNotFoundException;
 
+import org.digilib.library.models.dto.book.LibraryBookData;
+import org.digilib.library.services.BookCopyService;
 import org.digilib.library.services.BookService;
 import org.digilib.library.validators.isbn.IsbnValidator;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +38,8 @@ import static org.digilib.library.LibraryApplication.*;
 public class BookController {
 
     private final BookService bookService;
+
+    private final BookCopyService bookCopyService;
 
     @GetMapping("/books")
     public ResponseEntity<Page<BookData>> getAllBooks(
@@ -58,6 +63,8 @@ public class BookController {
                 .body(bookPage.map(BookData::wrapBook));
     }
 
+
+
     @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
     @PostMapping("/books")
     public ResponseEntity<BookData> createBook(@RequestBody @Valid BookCreateView creationData) {
@@ -71,6 +78,17 @@ public class BookController {
 
         return ResponseEntity.created(location)
                 .body(BookData.wrapBook(saved));
+    }
+
+    @GetMapping("/books/{isbn}/copies")
+    public ResponseEntity<List<LibraryBookData>> getBookCopies(@PathVariable String isbn) {
+
+        InvalidRequestParamException.throwIf(isbn, "isbn", s -> !IsbnValidator.isValidIsbn13(s));
+
+        List<LibraryBookData> copies = bookCopyService.findCopiesForBook(isbn);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
+                .body(copies);
     }
 
     @GetMapping("/books/{isbn}")

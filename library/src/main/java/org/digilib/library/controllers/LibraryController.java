@@ -118,7 +118,7 @@ public class LibraryController {
                 .body(saved);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN', 'USER')")
     @PatchMapping("/libraries/{libraryId}/books/{bookId}")
     public ResponseEntity<BookCopyData> updateLibraryBook(@PathVariable long libraryId,
                                                           @PathVariable long bookId,
