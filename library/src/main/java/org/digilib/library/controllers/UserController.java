@@ -4,9 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.digilib.library.errors.exceptions.InvalidRequestParamException;
+import org.digilib.library.models.Reservation;
 import org.digilib.library.models.User;
+import org.digilib.library.models.dto.ReservationData;
 import org.digilib.library.models.dto.user.UserData;
 import org.digilib.library.models.dto.user.UserUpdate;
+import org.digilib.library.repositories.ReservationRepository;
 import org.digilib.library.services.JwtService;
 import org.digilib.library.services.UserService;
 import org.springframework.data.domain.Page;
@@ -31,6 +34,7 @@ public class UserController {
 
     private final UserService userService;
     private final JwtService jwtService;
+    private final ReservationRepository reservationRepository;
 
     @GetMapping("/me")
     public ResponseEntity<UserData> getCurrentUser(@AuthenticationPrincipal User currentUser,
@@ -38,6 +42,24 @@ public class UserController {
         String token = authorizationHeader.replace("Bearer ", "");
         List<String> roles = jwtService.extractRolesFromToken(token);
         return ResponseEntity.ok(UserData.wrapUser(currentUser, roles));
+    }
+
+    @GetMapping("/me/reservations")
+    public ResponseEntity<Page<ReservationData>> getCurrentUserReservations(@AuthenticationPrincipal User currentUser,
+                                                                      @RequestParam(name = "page") int pageNumber,
+                                                                      @RequestParam(name = "sorts") String[] sorts){
+        InvalidRequestParamException.notPositivePage(pageNumber);
+
+        InvalidRequestParamException.notValidSorts(sorts, Reservation.class);
+
+        PageRequest pageable = PageRequest.of(
+                pageNumber - 1,
+                PAGE_SIZE,
+                Sort.by(sorts));
+        Page<Reservation> reservations = reservationRepository
+                                                        .findAllByUserId(currentUser.getId(), pageable);
+
+        return ResponseEntity.ok(reservations.map(ReservationData::of));
     }
 
 

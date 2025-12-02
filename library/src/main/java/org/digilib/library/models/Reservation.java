@@ -27,6 +27,10 @@ public final class Reservation {
     @JoinColumn(name = "book_isbn", referencedColumnName = "isbn", nullable = false)
     private Book book;
 
+    @Column(name = "barcode", unique = true, nullable = false, length = 50)
+    private String barcode;
+
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
