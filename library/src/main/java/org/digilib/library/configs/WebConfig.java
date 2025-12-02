@@ -18,14 +18,16 @@ import java.util.Map;
 public class WebConfig implements WebMvcConfigurer {
 
     private static final MediaType UTF_8_JSON = new MediaType("application", "json", StandardCharsets.UTF_8);
+    private static final MediaType OPEN_API_YAML = new MediaType("application", "vnd.oai.openapi", StandardCharsets.UTF_8);
 
     @Override
     public void configureContentNegotiation(@NonNull ContentNegotiationConfigurer config) {
         config.favorParameter(false)
-                .ignoreAcceptHeader(true)
+                .ignoreAcceptHeader(false)
                 .defaultContentType(UTF_8_JSON)
                 .mediaTypes(Map.of(
-                        "json", UTF_8_JSON
+                        "json", UTF_8_JSON,
+                        "openapi", OPEN_API_YAML
                 ))
         ;
     }

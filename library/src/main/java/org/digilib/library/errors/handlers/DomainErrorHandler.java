@@ -58,4 +58,11 @@ public class DomainErrorHandler{
         body.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(body);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException e) {
+        Map<String, Object> body = responseMap(3, HttpStatus.CONFLICT);
+        body.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
 }
